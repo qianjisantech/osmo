@@ -1,0 +1,33 @@
+syntax = "v1"
+
+info
+(
+    title:   "config模块"
+    desc:    "config模块接口定义"
+    author:  "philip.shen"
+    email:   "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+
+
+type (
+    ConfigHotLoadingReq {
+
+    }
+    ConfigHotLoadingResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data interface{} `json:"data"`
+    }
+
+)
+
+@server(
+    group:  config
+    prefix: /polaris/config
+)
+service polaris-api {
+    @handler ConfigHotLoading
+    post /hostloading (ConfigHotLoadingReq) returns (ConfigHotLoadingResp)
+
+}

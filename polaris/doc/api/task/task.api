@@ -1,0 +1,36 @@
+syntax = "v1"
+
+info
+(
+    title:   "discovery模块"
+    desc:    "discovery模块接口定义"
+    author:  "philip.shen"
+    email:   "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+
+type (
+
+    TaskRunCallBackReq {
+      Id string  `json:"id"`
+      Status string  `json:"status"`
+      Message string  `json:"message"`
+      Name string  `json:"name"`
+     Success bool `json:"success"`
+      Timestamp string `json:"timestamp"`
+    }
+    TaskRunCallBackResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data interface{} `json:"data"`
+    }
+)
+
+@server(
+    group: task
+    prefix: /polaris/agent/task
+)
+service polaris-api {
+    @handler TaskRunCallBack
+    post /run/callback(TaskRunCallBackReq) returns (TaskRunCallBackResp)
+}

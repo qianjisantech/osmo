@@ -1,0 +1,14 @@
+import "auth/auth.api"
+import "system/user.api"
+import "gosmo/task_record.api"
+import "gosmo/resource_agent.api "
+
+info
+(
+	title:   "osmo后端"
+	desc:    "osmo后端"
+	author:  "philip.shen"
+	email:   "philip.shen@jtexpress.com"
+	version: "0.0.1"
+)
+

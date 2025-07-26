@@ -1,0 +1,30 @@
+syntax = "v1"
+
+info(
+    title:   "osmo后端"
+    desc:    "osmo后端"
+    author:  "philip.shen"
+    email:   "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+
+type (
+    UserInfoRequest {
+
+    }
+    UserInfoResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data interface{} `json:"data"`
+    }
+
+)
+
+@server(
+    group: system
+    prefix: /api/system
+)
+service osmo-api {
+    @handler UserInfo
+    get /user/info () returns (UserInfoResp)
+}

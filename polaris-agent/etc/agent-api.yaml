@@ -1,0 +1,26 @@
+Name: agent-api
+Host: 0.0.0.0
+Port: 80
+
+Sqlite:
+  DataSourceName : 'agent.db?_journal_mode=WAL&_sync=1&_foreign_keys=1'
+  SqlFilePath : 'doc/sql/agent.sql'
+Timer:
+  Interval: 10
+
+Polaris:
+  Discovery:
+    Addr: 'http://127.0.0.1:8080'
+    HeartbeatInterval: 30
+    Timeout: 5
+    Retry:
+      MaxAttempts: 3
+      Backoff: 500
+Task:
+  ##默认只能三个任务并行
+  MaxConcurrent: 2
+Kafka:
+  Host: "10.24.11.21:30320,10.24.11.22:30321,10.24.11.21:30322"
+  Topic: "polaris"
+  Offset: "first"  # 从最早的消息开始消费
+  Processors: 4    # 处理器数量

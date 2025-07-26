@@ -1,0 +1,49 @@
+syntax = "v1"
+
+info(
+    title:   "osmo后端"
+    desc:    "osmo后端"
+    author:  "philip.shen"
+    email:   "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+type (
+
+    AuthLoginReq {
+        Username string `json:"username"`
+        Password string `json:"password"`
+        SelectAccount string `json:"selectAccount"`
+        Captcha bool `json:"captcha"`
+    }
+    AuthLoginResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data interface{} `json:"data"`
+        Error string `json:"error"`
+    }
+    AuthCodesResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data interface{} `json:"data"`
+    }
+    AuthLogoutReq {
+
+    }
+    AuthLogoutResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+)
+
+@server(
+    group: auth
+    prefix: /api/auth
+)
+service osmo-api {
+    @handler AuthLogin
+    post /login (AuthLoginReq) returns (AuthLoginResp)
+    @handler AuthCodes
+    get /codes () returns (AuthCodesResp)
+    @handler AuthLogout
+    get /logout (AuthLogoutReq) returns (AuthLogoutResp)
+}

@@ -1,0 +1,88 @@
+info
+(
+	title:   "osmo后端"
+	desc:    "osmo后端"
+	author:  "philip.shen"
+	email:   "philip.shen@jtexpress.com"
+	version: "0.0.1"
+)
+
+type (
+	AgentTaskStartReq {
+		Id          string `json:"id"`
+		Name        string `json:"name"`
+		CallBackUrl string `json:"call_back_url"`
+		EndTime     string `json:"end_time"`
+		ListenPort  string `json:"listen_port"`
+	}
+	AgentTaskStartResp {
+		Success bool                 `json:"success"`
+		Message string               `json:"message"`
+		Data    AgentTaskRunRespData `json:"data"`
+	}
+	AgentTaskRunRespData {
+		Id         string `json:"id"`
+		Name       string `json:"name"`
+		ListenPort string `json:"listen_port"`
+		Status     string `json:"status"`
+		StartTime  string `json:"start_time"`
+		EndTime    string `json:"end_time"`
+		Duration   string `json:"duration"`
+	}
+	AgentTaskListReq  {}
+	AgentTaskListResp {
+		Success bool                    `json:"success"`
+		Message string                  `json:"message"`
+		Data    []AgentTaskListRespData `json:"data"`
+	}
+	AgentTaskListRespData {
+		Id         string `json:"id"`
+		Name       string `json:"name"`
+		ListenPort string `json:"listen_port"`
+		Status     string `json:"status"`
+		StartTime  string `json:"start_time"`
+		EndTime    string `json:"end_time"`
+		Duration   string `json:"duration"`
+	}
+	AgentTaskStopReq {
+		Id          string `json:"id"`
+		CallBackUrl string `json:"call_back_url"`
+	}
+	AgentTaskStopResp {
+		Success bool                  `json:"success"`
+		Message string                `json:"message"`
+		Data    AgentTaskStopRespData `json:"data"`
+	}
+	AgentTaskStopRespData {
+		Id     string `json:"id"`
+		Status string `json:"status"`
+	}
+	AgentTaskCloseReq {
+		Id          string `json:"id"`
+		CallBackUrl string `json:"call_back_url"`
+	}
+	AgentTaskCloseResp {
+		Success bool        `json:"success"`
+		Message string      `json:"message"`
+		Data    interface{} `json:"data"`
+	}
+)
+
+@server (
+	group:  agent
+	prefix: /agent
+)
+service agent-api {
+	@handler AgentTaskStart
+	post /task/start (AgentTaskStartReq) returns (AgentTaskStartResp)
+
+	@handler AgentTaskList
+	get /task/list (AgentTaskListReq) returns (AgentTaskListResp)
+
+	@handler AgentTaskStop
+	post /task/stop (AgentTaskStopReq) returns (AgentTaskStopResp)
+
+	@handler AgentTaskClose
+	post /task/close (AgentTaskCloseReq) returns (AgentTaskCloseResp)
+}
+

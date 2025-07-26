@@ -1,0 +1,22 @@
+Name: polaris-api
+Host: 0.0.0.0
+Port: 8080
+
+Mysql:
+  Datasource: root:123456@tcp(localhost:3306)/osmo?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  OpenDebugLog: true
+  MaxIdleConns: 10
+  MaxOpenConns: 100
+
+Kafka:
+  Brokers:
+    - "10.24.11.21:30320"
+    - "10.24.11.22:30321"
+    - "10.24.11.21:30322"
+  Topic: "polaris"
+  Group: "polaris-group"
+  Offset: "first"  # 从最早的消息开始消费
+  Consumers: 4     # 消费者数量
+  Processors: 4    # 处理器数量
+
+

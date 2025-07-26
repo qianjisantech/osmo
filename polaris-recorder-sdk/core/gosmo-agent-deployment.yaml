@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gosmo-agent
+  labels:
+    app: gosmo-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gosmo-agent
+  template:
+    metadata:
+      labels:
+        app: gosmo-agent
+    spec:
+      hostNetwork: true  # 使用主机网络
+      containers:
+        - name: gosmo-agent
+          image: registry.cn-shanghai.aliyuncs.com/qianjisan/gosmo-agent:latest
+          # 直接使用 Dockerfile 中定义的 ENTRYPOINT 和 CMD
+          args:
+            - "--input-raw=:80"
+            - "--input-raw-track-response"
+            - "--output-stdout"
+            - "--output-elasticsearch-host=http://101.201.116.86:9200"
+            - "--output-elasticsearch-index=gosmo"
+          securityContext:
+            capabilities:
+              add: ["NET_RAW", "NET_ADMIN"]
+            privileged: false
+      imagePullSecrets:
+        - name: aliyun-registry-secret

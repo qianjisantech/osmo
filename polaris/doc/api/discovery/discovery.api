@@ -1,0 +1,88 @@
+syntax = "v1"
+
+info
+(
+    title:   "discovery模块"
+    desc:    "discovery模块接口定义"
+    author:  "philip.shen"
+    email:   "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+
+type (
+    DiscoveryRegisterReq {
+        IP string `json:"ip"`
+        Hostname string  `json:"hostname"`
+        CPUCores int `json:"cpu_cores"`
+        CPUUsedPercent float64 `json:"cpu_used_percent"`
+        CPUFreePercent float64 ` json:"cpu_free_percent"`
+        MemoryTotal int64 ` json:"memory_total"`
+        MemoryUsed int64 ` json:"memory_used"`
+        MemoryFree int64 ` json:"memory_free"`
+        MemoryUsedPercent float64 ` json:"memory_used_percent"`
+        NetworkBytesSent int64 ` json:"network_bytes_sent"`
+        NetworkBytesReceive int64 `json:"network_bytes_receive"`
+        NetworkPacketsSent int64 ` json:"network_packets_sent"`
+        NetworkPacketsReceive int64 ` json:"network_packets_receive"`
+    }
+    DiscoveryRegisterResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data DiscoveryRegisterRespData `json:"data"`
+    }
+    DiscoveryRegisterRespData {
+        Id string  `json:"id"`
+        IP string `json:"ip"`
+        Hostname string  `json:"hostname"`
+        CPUCores int `json:"cpu_cores"`
+        CPUUsedPercent float64 `json:"cpu_used_percent"`
+        CPUFreePercent float64 ` json:"cpu_free_percent"`
+        MemoryTotal int64 ` json:"memory_total"`
+        MemoryUsed int64 ` json:"memory_used"`
+        MemoryFree int64 ` json:"memory_free"`
+        MemoryUsedPercent float64 ` json:"memory_used_percent"`
+        NetworkBytesSent int64 ` json:"network_bytes_sent"`
+        NetworkBytesReceive int64 `json:"network_bytes_receive"`
+        NetworkPacketsSent int64 ` json:"network_packets_sent"`
+        NetworkPacketsReceive int64 ` json:"network_packets_receive"`
+        IdentificationCode string `json:"identification_code"`
+    }
+    DiscoveryHeatBeatReq {
+        IdentificationCode string `path:"identification_code"`
+        IP string `json:"ip"`
+        Status string  `json:"status"`
+        Hostname string  `json:"hostname"`
+        CPUCores int `json:"cpu_cores"`
+        CPUUsedPercent float64 `json:"cpu_used_percent"`
+        CPUFreePercent float64 ` json:"cpu_free_percent"`
+        MemoryTotal int64 ` json:"memory_total"`
+        MemoryUsed int64 ` json:"memory_used"`
+        MemoryFree int64 ` json:"memory_free"`
+        MemoryUsedPercent float64 ` json:"memory_used_percent"`
+        NetworkBytesSent int64 ` json:"network_bytes_sent"`
+        NetworkBytesReceive int64 `json:"network_bytes_receive"`
+        NetworkPacketsSent int64 ` json:"network_packets_sent"`
+        NetworkPacketsReceive int64 ` json:"network_packets_receive"`
+    }
+    DiscoveryHeatBeatResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data DiscoveryHeatBeatRespData `json:"data"`
+    }
+    DiscoveryHeatBeatRespData {
+        Id string  `json:"id"`
+        Name string  `json:"name"`
+    }
+
+)
+
+@server(
+    group: discovery
+    prefix: /polaris/v1/discovery
+)
+service polaris-api {
+    @handler DiscoveryRegister
+    post /agent/register (DiscoveryRegisterReq) returns (DiscoveryRegisterResp)
+    @handler DiscoveryHeatBeat
+    post /agent/heatbeat/:identification_code (DiscoveryHeatBeatReq) returns (DiscoveryHeatBeatResp)
+}

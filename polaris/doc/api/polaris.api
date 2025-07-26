@@ -1,0 +1,13 @@
+import "discovery/discovery.api"
+import "config/config.api"
+import "task/task.api"
+
+info
+(
+	title:   "polaris"
+	desc:    "polaris"
+	author:  "philip.shen"
+	email:   "philip.shen@jtexpress.com"
+	version: "0.0.1"
+)
+
