@@ -764,9 +764,15 @@ importers:
       '@vueuse/core':
         specifier: 'catalog:'
         version: 13.4.0(vue@3.5.17(typescript@5.8.3))
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       dayjs:
         specifier: 'catalog:'
         version: 1.11.13
+      echarts:
+        specifier: 'catalog:'
+        version: 5.6.0
       element-plus:
         specifier: 'catalog:'
         version: 2.10.2(vue@3.5.17(typescript@5.8.3))
@@ -786,6 +792,9 @@ importers:
       unplugin-element-plus:
         specifier: 'catalog:'
         version: 0.10.0
+      vite-plugin-vitepress:
+        specifier: 0.0.1-alpha.1
+        version: 0.0.1-alpha.1(vitepress@1.6.3(@algolia/client-search@5.23.4)(@types/node@22.16.0)(async-validator@4.2.5)(axios@1.10.0)(jwt-decode@4.0.0)(less@4.3.0)(nprogress@0.2.0)(postcss@8.5.6)(qrcode@1.5.4)(sass@1.89.2)(search-insights@2.17.3)(sortablejs@1.15.6)(terser@5.39.0)(typescript@5.8.3))
 
   apps/web-naive:
     dependencies:
@@ -11123,6 +11132,11 @@ packages:
     peerDependenciesMeta:
       '@vite-pwa/assets-generator':
         optional: true
+
+  vite-plugin-vitepress@0.0.1-alpha.1:
+    resolution: {integrity: sha512-2iliR9a/OMnUm4s1OEK50Y2X5wdsiWmfx66fnoCeK1odq92SMckGuNh3HKEcFp1+nOYbU3hJAkQS8Ixwa1hefw==}
+    peerDependencies:
+      vitepress: 1.0.0-alpha.30
 
   vite-plugin-vue-devtools@7.7.7:
     resolution: {integrity: sha512-d0fIh3wRcgSlr4Vz7bAk4va1MkdqhQgj9ANE/rBhsAjOnRfTLs2ocjFMvSUOsv6SRRXU9G+VM7yMgqDb6yI4iQ==}
@@ -21930,6 +21944,10 @@ snapshots:
       workbox-window: 7.3.0
     transitivePeerDependencies:
       - supports-color
+
+  vite-plugin-vitepress@0.0.1-alpha.1(vitepress@1.6.3(@algolia/client-search@5.23.4)(@types/node@22.16.0)(async-validator@4.2.5)(axios@1.10.0)(jwt-decode@4.0.0)(less@4.3.0)(nprogress@0.2.0)(postcss@8.5.6)(qrcode@1.5.4)(sass@1.89.2)(search-insights@2.17.3)(sortablejs@1.15.6)(terser@5.39.0)(typescript@5.8.3)):
+    dependencies:
+      vitepress: 1.6.3(@algolia/client-search@5.23.4)(@types/node@22.16.0)(async-validator@4.2.5)(axios@1.10.0)(jwt-decode@4.0.0)(less@4.3.0)(nprogress@0.2.0)(postcss@8.5.6)(qrcode@1.5.4)(sass@1.89.2)(search-insights@2.17.3)(sortablejs@1.15.6)(terser@5.39.0)(typescript@5.8.3)
 
   vite-plugin-vue-devtools@7.7.7(rollup@4.44.1)(vite@6.3.5(@types/node@22.16.0)(jiti@2.4.2)(less@4.3.0)(sass@1.89.2)(terser@5.39.0)(yaml@2.8.0))(vue@3.5.17(typescript@5.8.3)):
     dependencies:
