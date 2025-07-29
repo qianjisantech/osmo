@@ -20,7 +20,7 @@ export const zh = defineConfig({
       text: '在 GitHub 上编辑此页面',
     },
     footer: {
-      copyright: `Copyright © 2020-${new Date().getFullYear()} Vben`,
+      copyright: `Copyright © 2025-${new Date().getFullYear()} Osmo`,
       message: '基于 MIT 许可发布.',
     },
     langMenuLabel: '多语言',
