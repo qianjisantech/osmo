@@ -53,8 +53,9 @@ type ResourceAgentConsoleRespData struct {
 }
 
 type ResourceAgentCreateReq struct {
-	Name        string `json:"name"`                 // 执行机名称
-	Description string `json:"description,optional"` // 描述信息
+	Name            string `json:"name"`                 // 执行机名称
+	Description     string `json:"description,optional"` // 描述信息
+	SelectedAgentId string `json:"selected_agent_id"`
 }
 
 type ResourceAgentCreateResp struct {
@@ -127,10 +128,11 @@ type ResourceAgentDetailV2RespDataTask struct {
 }
 
 type ResourceAgentQueryPageReq struct {
-	PageSize int    `json:"page_size"`       //页最大数量
-	Page     int    `json:"page"`            //当前页
-	Keyword  string `json:"keyword"`         // 关键字
-	Status   string `json:"status,optional"` // 状态 (offline:离线, healthy:健康, warning:警告, error:异常 created:待部署)
+	PageSize      int    `json:"page_size"` //页最大数量
+	Page          int    `json:"page"`      //当前页
+	Keyword       string `json:"keyword"`   // 关键字
+	ExecuteStatus string `json:"execute_status,optional"`
+	Status        string `json:"status,optional"` // 状态 (offline:离线, healthy:健康, warning:警告, error:异常 created:待部署)
 }
 
 type ResourceAgentQueryPageResp struct {
@@ -145,7 +147,6 @@ type ResourceAgentQueryPageRespBoard struct {
 	Warning int `json:"warning"` // 警告数量
 	Error   int `json:"error"`   // 异常数量
 	Offline int `json:"offline"` // 离线数量
-	Created int `json:"created"` // 新增数量
 }
 
 type ResourceAgentQueryPageRespData struct {
@@ -155,10 +156,11 @@ type ResourceAgentQueryPageRespData struct {
 }
 
 type ResourceAgentQueryPageRespRecord struct {
-	ID                    string  `json:"id"`               // 执行机ID
-	Name                  string  `json:"name"`             // 执行机名称
-	IP                    string  `json:"ip"`               // IP地址
-	Description           string  `json:"description"`      // 描述信息
+	ID                    string  `json:"id"`          // 执行机ID
+	Name                  string  `json:"name"`        // 执行机名称
+	IP                    string  `json:"ip"`          // IP地址
+	Description           string  `json:"description"` // 描述信息
+	ExecuteStatus         string  `json:"execute_status"`
 	Status                string  `json:"status"`           // 状态 (offline:离线, healthy:健康, warning:警告, error:异常 created:待部署)
 	LastReportTime        string  `json:"last_report_time"` // 最后上报时间
 	StartTime             string  `json:"start_time"`
@@ -174,6 +176,22 @@ type ResourceAgentQueryPageRespRecord struct {
 	NetworkBytesReceive   float64 `json:"network_bytes_receive"`
 	NetworkPacketsSent    float64 ` json:"network_packets_sent"`
 	NetworkPacketsReceive float64 ` json:"network_packets_receive"`
+}
+
+type ResourceAgentSelectOptionsReq struct {
+	Keyword string `json:"keyword,optional"`
+}
+
+type ResourceAgentSelectOptionsResp struct {
+	Success bool                                 `json:"success"`
+	Message string                               `json:"message"`
+	Data    []ResourceAgentSelectOptionsRespData `json:"data" `
+}
+
+type ResourceAgentSelectOptionsRespData struct {
+	Id    string `json:"id"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 type ResourceAgentUpdateReq struct {
@@ -284,6 +302,40 @@ type TaskRecordUpdateReq struct {
 type TaskRecordUpdateResp struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
+}
+
+type TrafficPoolDetailReq struct {
+}
+
+type TrafficPoolDetailResp struct {
+}
+
+type TrafficPoolQueryPageReq struct {
+	PageSize int    `json:"page_size"` //页最大数量
+	Page     int    `json:"page"`      //当前页
+	Keyword  string `json:"keyword"`   // 关键字
+}
+
+type TrafficPoolQueryPageResp struct {
+	Success bool                         `json:"success"`
+	Message string                       `json:"message"`
+	Data    TrafficPoolQueryPageRespData `json:"data"`
+}
+
+type TrafficPoolQueryPageRespData struct {
+	Total   int                                  `json:"total"`
+	Records []TrafficPoolQueryPageRespDataRecord `json:"records"`
+}
+
+type TrafficPoolQueryPageRespDataRecord struct {
+	Id              string `json:"id"`
+	Url             string `json:"url"`
+	RequestBody     string `json:"request_body"`
+	RequestHeaders  string `json:"request_headers"`
+	ResponseBody    string `json:"response_body"`
+	ResponseHeaders string `json:"response_headers"`
+	Method          string `json:"method"`
+	HttpType        string `json:"http_type"`
 }
 
 type UserInfoRequest struct {

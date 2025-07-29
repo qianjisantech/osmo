@@ -2,6 +2,7 @@ package resource
 
 import (
 	"context"
+	"osmo/constant"
 	"osmo/gen/query"
 	"osmo/internal/common/errorx"
 	"strconv"
@@ -14,12 +15,7 @@ import (
 )
 
 var (
-	Statuses           = []string{AgentStatusOffline, AgentStatusHealthy, AgentStatusWarning, AgentStatusError, AgentStatusCreated}
-	AgentStatusOffline = "offline"
-	AgentStatusHealthy = "healthy"
-	AgentStatusWarning = "warning"
-	AgentStatusError   = "error"
-	AgentStatusCreated = "created"
+	Statuses = []string{string(constant.AgentStatusRegister), string(constant.AgentStatusHealthy), string(constant.AgentStatusOffline), string(constant.AgentStatusError), string(constant.AgentStatusWarning)}
 )
 
 type ResourceAgentQueryPageLogic struct {
@@ -42,13 +38,16 @@ func (l *ResourceAgentQueryPageLogic) ResourceAgentQueryPage(req *types.Resource
 
 	// 构建基础查询条件
 	queryBuilder := q.WithContext(l.ctx).Debug().
-		Where(q.IsDeleted.Is(false))
+		Where(q.IsDeleted.Is(false)).Where(q.Status.Neq(string(constant.AgentStatusRegister)))
 
 	// 添加状态筛选条件
 	if req.Status != "" {
 		queryBuilder = queryBuilder.Where(q.Status.Eq(req.Status))
 	}
-
+	// 添加关键词搜索条件
+	if req.ExecuteStatus != "" {
+		queryBuilder = queryBuilder.Where(q.ExecuteStatus.Eq(req.ExecuteStatus))
+	}
 	// 添加关键词搜索条件
 	if req.Keyword != "" {
 		queryBuilder = queryBuilder.Where(
@@ -129,8 +128,10 @@ func (l *ResourceAgentQueryPageLogic) ResourceAgentQueryPage(req *types.Resource
 			NetworkPacketsReceive: float64(agent.NetworkPacketsReceive),
 			MemoryFree:            float64(agent.MemoryFree),
 			MemoryTotal:           float64(agent.MemoryTotal),
+			MemoryUsedPercent:     agent.MemoryUsedPercent,
 			StartTime:             startTime,
 			StopTime:              stopTime,
+			ExecuteStatus:         agent.ExecuteStatus,
 		})
 	}
 
@@ -158,7 +159,7 @@ func (l *ResourceAgentQueryPageLogic) getStatusCounts() (types.ResourceAgentQuer
 
 	// 获取总数
 	total, err := q.GosmoResourceAgent.WithContext(l.ctx).
-		Where(q.GosmoResourceAgent.IsDeleted.Is(false)).
+		Where(q.GosmoResourceAgent.IsDeleted.Is(false)).Where(q.GosmoResourceAgent.Status.Neq(string(constant.AgentStatusRegister))).
 		Count()
 	if err != nil {
 		return board, errorx.NewDefaultErrorf("获取总数失败: %v", err)
@@ -195,16 +196,14 @@ func (l *ResourceAgentQueryPageLogic) getStatusCounts() (types.ResourceAgentQuer
 		}
 
 		switch result.status {
-		case AgentStatusHealthy:
+		case string(constant.AgentStatusHealthy):
 			board.Healthy = int(result.count)
-		case AgentStatusWarning:
+		case string(constant.AgentStatusWarning):
 			board.Warning = int(result.count)
-		case AgentStatusError:
+		case string(constant.AgentStatusError):
 			board.Error = int(result.count)
-		case AgentStatusOffline:
+		case string(constant.AgentStatusOffline):
 			board.Offline = int(result.count)
-		case AgentStatusCreated:
-			board.Created = int(result.count)
 		}
 	}
 

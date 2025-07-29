@@ -1,0 +1,54 @@
+syntax = "v1"
+
+info(
+    title: "osmo后端"
+    desc: "osmo后端"
+    author: "philip.shen"
+    email: "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+type (
+    TrafficPoolQueryPageReq{
+        PageSize int `json:"page_size"`            //页最大数量
+        Page int `json:"page"`                     //当前页
+        Keyword string `json:"keyword"`            // 关键字
+    }
+    TrafficPoolQueryPageResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data TrafficPoolQueryPageRespData `json:"data"`
+    }
+    TrafficPoolQueryPageRespData {
+        Total int `json:"total"`
+        Records []TrafficPoolQueryPageRespDataRecord `json:"records"`
+    }
+    TrafficPoolQueryPageRespDataRecord{
+        Id string     `json:"id"`
+        Url string    `json:"url"`
+        RequestBody string `json:"request_body"`
+        RequestHeaders string `json:"request_headers"`
+        ResponseBody string `json:"response_body"`
+        ResponseHeaders string `json:"response_headers"`
+        Method string `json:"method"`
+        HttpType string   `json:"http_type"`
+    }
+    TrafficPoolDetailReq{
+
+    }
+    TrafficPoolDetailResp{
+
+    }
+)
+
+@server(
+    group: gosmo/traffic
+    prefix: /api/gosmo/traffic/pool
+)
+service osmo-api {
+    // 执行机分页查询
+    @handler TrafficPoolQueryPage
+    post /page (TrafficPoolQueryPageReq) returns (TrafficPoolQueryPageResp)
+    // 执行机编辑页详情
+    @handler TrafficPoolDetail
+    get /detail/:id (TrafficPoolDetailReq) returns (TrafficPoolDetailResp)
+}

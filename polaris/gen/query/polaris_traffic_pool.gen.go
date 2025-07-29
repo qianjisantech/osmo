@@ -28,8 +28,6 @@ func newPolarisTrafficPool(db *gorm.DB, opts ...gen.DOOption) polarisTrafficPool
 	tableName := _polarisTrafficPool.polarisTrafficPoolDo.TableName()
 	_polarisTrafficPool.ALL = field.NewAsterisk(tableName)
 	_polarisTrafficPool.ID = field.NewInt64(tableName, "id")
-	_polarisTrafficPool.Content = field.NewString(tableName, "content")
-	_polarisTrafficPool.TaskID = field.NewString(tableName, "task_id")
 	_polarisTrafficPool.IsDeleted = field.NewBool(tableName, "is_deleted")
 	_polarisTrafficPool.DeletedTime = field.NewTime(tableName, "deleted_time")
 	_polarisTrafficPool.DeletedBy = field.NewString(tableName, "deleted_by")
@@ -40,7 +38,15 @@ func newPolarisTrafficPool(db *gorm.DB, opts ...gen.DOOption) polarisTrafficPool
 	_polarisTrafficPool.UpdateTime = field.NewTime(tableName, "update_time")
 	_polarisTrafficPool.UpdateBy = field.NewString(tableName, "update_by")
 	_polarisTrafficPool.UpdateByName = field.NewString(tableName, "update_by_name")
+	_polarisTrafficPool.Method = field.NewString(tableName, "method")
+	_polarisTrafficPool.URL = field.NewString(tableName, "url")
+	_polarisTrafficPool.RequestBody = field.NewString(tableName, "request_body")
+	_polarisTrafficPool.RequestHeaders = field.NewString(tableName, "request_headers")
+	_polarisTrafficPool.ResponseBody = field.NewString(tableName, "response_body")
+	_polarisTrafficPool.ResponseHeaders = field.NewString(tableName, "response_headers")
+	_polarisTrafficPool.TaskID = field.NewString(tableName, "task_id")
 	_polarisTrafficPool.APIID = field.NewString(tableName, "api_id")
+	_polarisTrafficPool.HTTPType = field.NewString(tableName, "http_type")
 
 	_polarisTrafficPool.fillFieldMap()
 
@@ -50,21 +56,27 @@ func newPolarisTrafficPool(db *gorm.DB, opts ...gen.DOOption) polarisTrafficPool
 type polarisTrafficPool struct {
 	polarisTrafficPoolDo polarisTrafficPoolDo
 
-	ALL           field.Asterisk
-	ID            field.Int64
-	Content       field.String
-	TaskID        field.String
-	IsDeleted     field.Bool
-	DeletedTime   field.Time
-	DeletedBy     field.String
-	DeletedByName field.String
-	CreateTime    field.Time
-	CreateBy      field.String
-	CreateByName  field.String
-	UpdateTime    field.Time
-	UpdateBy      field.String
-	UpdateByName  field.String
-	APIID         field.String
+	ALL             field.Asterisk
+	ID              field.Int64
+	IsDeleted       field.Bool
+	DeletedTime     field.Time
+	DeletedBy       field.String
+	DeletedByName   field.String
+	CreateTime      field.Time
+	CreateBy        field.String
+	CreateByName    field.String
+	UpdateTime      field.Time
+	UpdateBy        field.String
+	UpdateByName    field.String
+	Method          field.String
+	URL             field.String
+	RequestBody     field.String
+	RequestHeaders  field.String
+	ResponseBody    field.String
+	ResponseHeaders field.String
+	TaskID          field.String
+	APIID           field.String
+	HTTPType        field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -82,8 +94,6 @@ func (p polarisTrafficPool) As(alias string) *polarisTrafficPool {
 func (p *polarisTrafficPool) updateTableName(table string) *polarisTrafficPool {
 	p.ALL = field.NewAsterisk(table)
 	p.ID = field.NewInt64(table, "id")
-	p.Content = field.NewString(table, "content")
-	p.TaskID = field.NewString(table, "task_id")
 	p.IsDeleted = field.NewBool(table, "is_deleted")
 	p.DeletedTime = field.NewTime(table, "deleted_time")
 	p.DeletedBy = field.NewString(table, "deleted_by")
@@ -94,7 +104,15 @@ func (p *polarisTrafficPool) updateTableName(table string) *polarisTrafficPool {
 	p.UpdateTime = field.NewTime(table, "update_time")
 	p.UpdateBy = field.NewString(table, "update_by")
 	p.UpdateByName = field.NewString(table, "update_by_name")
+	p.Method = field.NewString(table, "method")
+	p.URL = field.NewString(table, "url")
+	p.RequestBody = field.NewString(table, "request_body")
+	p.RequestHeaders = field.NewString(table, "request_headers")
+	p.ResponseBody = field.NewString(table, "response_body")
+	p.ResponseHeaders = field.NewString(table, "response_headers")
+	p.TaskID = field.NewString(table, "task_id")
 	p.APIID = field.NewString(table, "api_id")
+	p.HTTPType = field.NewString(table, "http_type")
 
 	p.fillFieldMap()
 
@@ -123,10 +141,8 @@ func (p *polarisTrafficPool) GetFieldByName(fieldName string) (field.OrderExpr, 
 }
 
 func (p *polarisTrafficPool) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 14)
+	p.fieldMap = make(map[string]field.Expr, 20)
 	p.fieldMap["id"] = p.ID
-	p.fieldMap["content"] = p.Content
-	p.fieldMap["task_id"] = p.TaskID
 	p.fieldMap["is_deleted"] = p.IsDeleted
 	p.fieldMap["deleted_time"] = p.DeletedTime
 	p.fieldMap["deleted_by"] = p.DeletedBy
@@ -137,7 +153,15 @@ func (p *polarisTrafficPool) fillFieldMap() {
 	p.fieldMap["update_time"] = p.UpdateTime
 	p.fieldMap["update_by"] = p.UpdateBy
 	p.fieldMap["update_by_name"] = p.UpdateByName
+	p.fieldMap["method"] = p.Method
+	p.fieldMap["url"] = p.URL
+	p.fieldMap["request_body"] = p.RequestBody
+	p.fieldMap["request_headers"] = p.RequestHeaders
+	p.fieldMap["response_body"] = p.ResponseBody
+	p.fieldMap["response_headers"] = p.ResponseHeaders
+	p.fieldMap["task_id"] = p.TaskID
 	p.fieldMap["api_id"] = p.APIID
+	p.fieldMap["http_type"] = p.HTTPType
 }
 
 func (p polarisTrafficPool) clone(db *gorm.DB) polarisTrafficPool {

@@ -13,6 +13,7 @@ type (
         PageSize int `json:"page_size"`          //页最大数量
         Page int `json:"page"`                   //当前页
         Keyword string `json:"keyword"`          // 关键字
+        ExecuteStatus string `json:"execute_status,optional"`
         Status string `json:"status,optional"`   // 状态 (offline:离线, healthy:健康, warning:警告, error:异常 created:待部署)
     }
         //  ResourceAgentQueryPageResp 执行机分页查询返回体
@@ -27,6 +28,7 @@ type (
         Name string `json:"name"`                          // 执行机名称
         IP string `json:"ip"`                              // IP地址
         Description string `json:"description"`            // 描述信息
+        ExecuteStatus string    `json:"execute_status"`
         Status string `json:"status"`                      // 状态 (offline:离线, healthy:健康, warning:警告, error:异常 created:待部署)
         LastReportTime string `json:"last_report_time"`    // 最后上报时间
         StartTime string `json:"start_time"`
@@ -51,7 +53,6 @@ type (
         Warning int `json:"warning"`  // 警告数量
         Error int `json:"error"`      // 异常数量
         Offline int `json:"offline"`  // 离线数量
-        Created int `json:"created"`  // 新增数量
     }
 
         // ResourceAgentQueryPageRespData 查询返回数据
@@ -63,6 +64,7 @@ type (
     ResourceAgentCreateReq {
         Name string `json:"name"`                                   // 执行机名称
         Description string `json:"description,optional"`            // 描述信息
+        SelectedAgentId string `json:"selected_agent_id"`
     }
     ResourceAgentCreateResp {
         Success bool `json:"success"`
@@ -155,6 +157,19 @@ type (
         StrategyId string `json:"strategy_id"`
         StrategyName string `json:"strategy_name"`
     }
+    ResourceAgentSelectOptionsReq {
+     Keyword string    `json:"keyword,optional"`
+    }
+    ResourceAgentSelectOptionsResp{
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data []ResourceAgentSelectOptionsRespData `json:"data" `
+    }
+    ResourceAgentSelectOptionsRespData{
+        Id string `json:"id"`
+        Key string  `json:"key"`
+        Value string  `json:"value"`
+    }
 )
 
 @server(
@@ -180,4 +195,7 @@ service osmo-api {
     // 执行机详情
     @handler ResourceAgentDetailV2
     get /detail/v2/:id (ResourceAgentDetailV2Req) returns (ResourceAgentDetailV2Resp)
+    // 执行机详情
+    @handler ResourceAgentSelectOptions
+    post /select/options (ResourceAgentSelectOptionsReq) returns (ResourceAgentSelectOptionsResp)
 }

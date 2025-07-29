@@ -20,6 +20,7 @@ var (
 	GosmoResourceAgent *gosmoResourceAgent
 	GosmoTaskRecord    *gosmoTaskRecord
 	GosmoTaskReplay    *gosmoTaskReplay
+	PolarisTrafficPool *polarisTrafficPool
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -27,6 +28,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	GosmoResourceAgent = &Q.GosmoResourceAgent
 	GosmoTaskRecord = &Q.GosmoTaskRecord
 	GosmoTaskReplay = &Q.GosmoTaskReplay
+	PolarisTrafficPool = &Q.PolarisTrafficPool
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
@@ -35,6 +37,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		GosmoResourceAgent: newGosmoResourceAgent(db, opts...),
 		GosmoTaskRecord:    newGosmoTaskRecord(db, opts...),
 		GosmoTaskReplay:    newGosmoTaskReplay(db, opts...),
+		PolarisTrafficPool: newPolarisTrafficPool(db, opts...),
 	}
 }
 
@@ -44,6 +47,7 @@ type Query struct {
 	GosmoResourceAgent gosmoResourceAgent
 	GosmoTaskRecord    gosmoTaskRecord
 	GosmoTaskReplay    gosmoTaskReplay
+	PolarisTrafficPool polarisTrafficPool
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -54,6 +58,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		GosmoResourceAgent: q.GosmoResourceAgent.clone(db),
 		GosmoTaskRecord:    q.GosmoTaskRecord.clone(db),
 		GosmoTaskReplay:    q.GosmoTaskReplay.clone(db),
+		PolarisTrafficPool: q.PolarisTrafficPool.clone(db),
 	}
 }
 
@@ -71,6 +76,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		GosmoResourceAgent: q.GosmoResourceAgent.replaceDB(db),
 		GosmoTaskRecord:    q.GosmoTaskRecord.replaceDB(db),
 		GosmoTaskReplay:    q.GosmoTaskReplay.replaceDB(db),
+		PolarisTrafficPool: q.PolarisTrafficPool.replaceDB(db),
 	}
 }
 
@@ -78,6 +84,7 @@ type queryCtx struct {
 	GosmoResourceAgent IGosmoResourceAgentDo
 	GosmoTaskRecord    IGosmoTaskRecordDo
 	GosmoTaskReplay    IGosmoTaskReplayDo
+	PolarisTrafficPool IPolarisTrafficPoolDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
@@ -85,6 +92,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		GosmoResourceAgent: q.GosmoResourceAgent.WithContext(ctx),
 		GosmoTaskRecord:    q.GosmoTaskRecord.WithContext(ctx),
 		GosmoTaskReplay:    q.GosmoTaskReplay.WithContext(ctx),
+		PolarisTrafficPool: q.PolarisTrafficPool.WithContext(ctx),
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 	auth "osmo/internal/handler/auth"
 	gosmoresource "osmo/internal/handler/gosmo/resource"
 	gosmotask "osmo/internal/handler/gosmo/task"
+	gosmotraffic "osmo/internal/handler/gosmo/traffic"
 	system "osmo/internal/handler/system"
 	"osmo/internal/svc"
 
@@ -64,6 +65,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/select/options",
+				Handler: gosmoresource.ResourceAgentSelectOptionsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/update",
 				Handler: gosmoresource.ResourceAgentUpdateHandler(serverCtx),
 			},
@@ -95,6 +101,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/gosmo/task/record"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/detail/:id",
+				Handler: gosmotraffic.TrafficPoolDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/page",
+				Handler: gosmotraffic.TrafficPoolQueryPageHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/gosmo/traffic/pool"),
 	)
 
 	server.AddRoutes(

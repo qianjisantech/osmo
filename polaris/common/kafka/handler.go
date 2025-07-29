@@ -2,17 +2,31 @@ package consumer
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/segmentio/kafka-go"
+	"gorm.io/gorm"
 	"log"
 	"os"
 	"os/signal"
 	"polaris/gen/model"
+	"polaris/gen/query"
 	"polaris/internal/svc"
 	"strings"
 	"syscall"
 	"time"
 )
+
+type TrafficKafkaMsg struct {
+	URL       string            `json:"url"`
+	Type      string            `json:"type"`
+	ID        string            `json:"id"`
+	Timestamp string            `json:"timestamp"`
+	Method    string            `json:"method"`
+	Body      string            `json:"body"`
+	Headers   map[string]string `json:"headers"`
+}
 
 // 最大重试次数
 const maxRetries = 3
@@ -42,19 +56,84 @@ func HandleTransfer(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 
 // processSingleMessage 实际处理单条消息的逻辑
 func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
-	// 示例：将消息存入数据库
-	// 这里替换为你的实际业务逻辑
+	// 解析Kafka消息
 	log.Printf("处理消息: Topic=%s Partition=%d Offset=%d Key=%s Value=%s",
 		msg.Topic, msg.Partition, msg.Offset, string(msg.Key), string(msg.Value))
 
-	// 模拟可能出现的错误（实际使用时移除）
-	tx := svcCtx.DB.Create(&model.PolarisTrafficPool{
-		Content: string(msg.Value),
-		APIID:   string(msg.Key),
-		TaskID:  string(msg.Key),
-	})
-	log.Printf("创建流量%v", tx)
+	message, err := parseKafkaMessage(msg.Value)
+	if err != nil {
+		return fmt.Errorf("解析消息失败: %v", err)
+	}
+
+	// 先查询是否已存在该 APIID 的记录
+	var existingRecord model.PolarisTrafficPool
+	err = svcCtx.DB.Where(query.PolarisTrafficPool.APIID.Eq(message.ID)).First(&existingRecord).Error
+
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		// 记录不存在，根据类型创建记录
+		if message.Type == "1" { // 请求数据
+			headers := mapToJsonString(message.Headers)
+			tx := svcCtx.DB.Create(&model.PolarisTrafficPool{
+				APIID:          message.ID,
+				RequestHeaders: &headers,
+				RequestBody:    &message.Body,
+				URL:            message.URL,
+				Method:         message.Method,
+			})
+			if tx.Error != nil {
+				return fmt.Errorf("创建请求记录失败: %v", tx.Error)
+			}
+			log.Printf("创建请求记录成功，APIID: %s", message.ID)
+		} else if message.Type == "2" { // 响应数据
+			headers := mapToJsonString(message.Headers)
+			tx := svcCtx.DB.Create(&model.PolarisTrafficPool{
+				APIID:           message.ID,
+				ResponseHeaders: &headers,
+				ResponseBody:    &message.Body,
+				HTTPType:        &message.Method,
+			})
+			if tx.Error != nil {
+				return fmt.Errorf("创建请求记录失败: %v", tx.Error)
+			}
+			log.Printf("创建请求记录成功，APIID: %s", message.ID)
+			return nil
+		}
+	} else if err == nil {
+		// 记录已存在，根据类型更新相应字段
+		if message.Type == "1" { // 请求数据
+			updateFields := map[string]interface{}{
+				"request_headers": mapToJsonString(message.Headers),
+				"request_body":    message.Body,
+				"url":             message.URL,
+				"method":          message.Method,
+			}
+
+			tx := svcCtx.DB.Model(&existingRecord).Updates(updateFields)
+			if tx.Error != nil {
+				return fmt.Errorf("更新请求数据失败: %v", tx.Error)
+			}
+			log.Printf("更新请求数据成功，APIID: %s", message.ID)
+		} else if message.Type == "2" { // 响应数据
+			responseHeaders := mapToJsonString(message.Headers)
+			updateFields := map[string]interface{}{
+				"response_headers": responseHeaders,
+				"response_body":    message.Body,
+				"http_type":        message.Method,
+			}
+
+			tx := svcCtx.DB.Model(&existingRecord).Updates(updateFields)
+			if tx.Error != nil {
+				return fmt.Errorf("更新响应数据失败: %v", tx.Error)
+			}
+			log.Printf("更新响应数据成功，APIID: %s", message.ID)
+		}
+	} else {
+		// 查询出错
+		return fmt.Errorf("查询流量记录失败，APIID: %s, 错误: %v", message.ID, err)
+	}
+
 	return nil
+
 }
 
 // handleKafkaError 处理Kafka错误
@@ -85,4 +164,24 @@ func HandleShutdown(cancel context.CancelFunc, reader *kafka.Reader) {
 		}
 	}
 	cancel()
+}
+func parseKafkaMessage(msg []byte) (*TrafficKafkaMsg, error) {
+	// 解析外层请求
+	var trafficKafkaMsg *TrafficKafkaMsg
+	if err := json.Unmarshal(msg, &trafficKafkaMsg); err != nil {
+		return nil, fmt.Errorf("failed to parse request: %v", err)
+	}
+
+	return trafficKafkaMsg, nil
+}
+func mapToJsonString(headers map[string]string) string {
+	// 转换为 JSON 字符串
+	jsonBytes, err := json.Marshal(headers)
+	if err != nil {
+		fmt.Printf("转换失败: %v\n", err)
+		return ""
+	}
+
+	jsonStr := string(jsonBytes)
+	return jsonStr
 }

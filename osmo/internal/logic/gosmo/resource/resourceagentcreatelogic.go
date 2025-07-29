@@ -2,9 +2,11 @@ package resource
 
 import (
 	"context"
+	"osmo/constant"
 	"osmo/gen/model"
 	"osmo/gen/query"
 	"osmo/internal/common/errorx"
+	"strconv"
 
 	"osmo/internal/svc"
 	"osmo/internal/types"
@@ -31,7 +33,10 @@ func (l *ResourceAgentCreateLogic) ResourceAgentCreate(req *types.ResourceAgentC
 	if req.Name == "" {
 		return nil, errorx.NewDefaultError("执行机名称不能为空")
 	}
+	if req.SelectedAgentId == "" {
+		return nil, errorx.NewDefaultError("执行机ID不能为空")
 
+	}
 	// 2. 检查名称是否已存在
 	q := query.GosmoResourceAgent
 	existing, err := q.WithContext(l.ctx).Debug().
@@ -51,9 +56,10 @@ func (l *ResourceAgentCreateLogic) ResourceAgentCreate(req *types.ResourceAgentC
 	agent := &model.GosmoResourceAgent{
 		Name:        &req.Name,
 		Description: &description, // 使用处理后的值
+		Status:      string(constant.AgentStatusHealthy),
 	}
-
-	err = q.WithContext(l.ctx).Create(agent)
+	id, err := strconv.ParseInt(req.SelectedAgentId, 10, 64)
+	_, err = q.WithContext(l.ctx).Where(q.ID.Eq(id)).Updates(agent)
 	if err != nil {
 		logx.Errorf("执行机创建失败: %v", err)
 		return nil, errorx.NewCodeErrorf("创建执行机失败: %v", err)

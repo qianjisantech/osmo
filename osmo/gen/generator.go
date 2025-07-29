@@ -35,6 +35,7 @@ func main() {
 		"gosmo_resource_agent",
 		"gosmo_task_replay",
 		"gosmo_task_record",
+		"polaris_traffic_pool",
 	}
 
 	// Apply configurations to all tables

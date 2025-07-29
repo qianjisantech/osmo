@@ -18,7 +18,10 @@ func (m *GosmoResourceAgent) BeforeCreate(tx *gorm.DB) (err error) {
 		logx.Infof("Generated snowflake ID: %s", m.ID)
 	}
 	if m.Status == "" {
-		m.Status = string(constant.AgentStatusRegister)
+		m.Status = string(constant.AgentStatusHealthy)
+	}
+	if m.ExecuteStatus == "" {
+		m.ExecuteStatus = string(constant.AgentTaskStatusIdle)
 	}
 	// 确保必填字段有值
 	if m.CreateBy == "" {
