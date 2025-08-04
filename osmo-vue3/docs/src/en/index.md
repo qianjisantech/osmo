@@ -8,7 +8,7 @@ hero:
   text: Enterprise-Level Management System Framework
   tagline: Fully Upgraded, Ready to Use, Simple and Efficient
   image:
-    src: https://unpkg.com/@vbenjs/static-source@0.1.7/source/logo-v1.webp
+    src: https://img0.baidu.com/it/u=3666118719,1618638927&fm=253&fmt=auto&app=138&f=PNG
     alt: Osmo
   actions:
     - theme: brand

@@ -179,7 +179,9 @@ type ResourceAgentQueryPageRespRecord struct {
 }
 
 type ResourceAgentSelectOptionsReq struct {
-	Keyword string `json:"keyword,optional"`
+	Keyword       string   `json:"keyword,optional"`
+	Status        []string `json:"status,optional"`
+	ExecuteStatus []string `json:"execute_status,optional"`
 }
 
 type ResourceAgentSelectOptionsResp struct {
@@ -189,9 +191,10 @@ type ResourceAgentSelectOptionsResp struct {
 }
 
 type ResourceAgentSelectOptionsRespData struct {
-	Id    string `json:"id"`
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	Id            string `json:"id"`
+	Key           string `json:"key"`
+	Value         string `json:"value"`
+	ExecuteStatus string `json:"execute_status"`
 }
 
 type ResourceAgentUpdateReq struct {
@@ -206,14 +209,25 @@ type ResourceAgentUpdateResp struct {
 }
 
 type TaskRecordCreateReq struct {
-	Name         string `json:"name"`                 // 录制任务名称
-	Description  string `json:"description,optional"` // 描述信息
-	StrategyId   string `json:"strategy_id"`          // 录制策略id
-	StrategyName string `json:"strategy_name"`        // 录制策略名称
-	RuleId       string `json:"rule_id"`              // 录制规则Id
-	RuleName     string `json:"rule_name"`            // 录制规则名称
-	AgentId      string `json:"agent_id"`
-	AgentName    string `json:"agent_name"`
+	Name        string                       `json:"name"`                 // 录制任务名称
+	Description string                       `json:"description,optional"` // 描述信息
+	Strategy    *TaskRecordCreateReqStrategy `json:"strategy"`             // 录制策略id
+	Agent       *TaskRecordCreateReqAgent    `json:"agent"`
+	RecordTime  []string                     `json:"record_time"`
+	ListenPort  string                       `json:"listen_port"`
+}
+
+type TaskRecordCreateReqAgent struct {
+	Id            string `json:"id"`
+	Key           string `json:"key"`
+	Value         string `json:"value"`
+	ExecuteStatus string `json:"execute_status"`
+}
+
+type TaskRecordCreateReqStrategy struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 type TaskRecordCreateResp struct {
@@ -236,8 +250,6 @@ type TaskRecordDetailRespData struct {
 	Name         string `json:"name"`        // 录制任务名称
 	Description  string `json:"description"` // 描述信息
 	Status       string `json:"status"`
-	RuleId       string `json:"rule_id"`
-	RuleName     string `json:"rule_name"`
 	StrategyId   string `json:"strategy_id"`
 	StrategyName string `json:"strategy_name"`
 	StartTime    string `json:"start_time"`
@@ -277,14 +289,13 @@ type TaskRecordQueryPageRespRecord struct {
 	Id           string `json:"id"`   // 录制任务Id
 	Name         string `json:"name"` // 录制任务名称
 	Status       string `json:"status"`
-	RuleId       string `json:"rule_id"`
-	RuleName     string `json:"rule_name"`
-	StrategyId   string `json:"strategy_id"`
+	StrategyCode string `json:"strategy_code"`
 	StrategyName string `json:"strategy_name"`
 	StartTime    string `json:"start_time"`
 	EndTime      string `json:"end_time"`
 	AgentId      string `json:"agent_id"`
 	AgentName    string `json:"agent_name"`
+	ListenPort   string `json:"listen_port"`
 }
 
 type TaskRecordUpdateReq struct {
@@ -293,8 +304,6 @@ type TaskRecordUpdateReq struct {
 	Description  string `json:"description,optional"` // 描述信息
 	StrategyId   string `json:"strategy_id"`          // 录制策略id
 	StrategyName string `json:"strategy_name"`        // 录制策略名称
-	RuleId       string `json:"rule_id"`              // 录制规则Id
-	RuleName     string `json:"rule_name"`            // 录制规则名称
 	AgentId      string `json:"agent_id"`
 	AgentName    string `json:"agent_name"`
 }

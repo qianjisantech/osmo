@@ -159,6 +159,8 @@ type (
     }
     ResourceAgentSelectOptionsReq {
      Keyword string    `json:"keyword,optional"`
+         Status []string    `json:"status,optional"`
+     ExecuteStatus []string `json:"execute_status,optional"`
     }
     ResourceAgentSelectOptionsResp{
         Success bool `json:"success"`
@@ -169,6 +171,7 @@ type (
         Id string `json:"id"`
         Key string  `json:"key"`
         Value string  `json:"value"`
+        ExecuteStatus string `json:"execute_status"`
     }
 )
 
@@ -195,7 +198,8 @@ service osmo-api {
     // 执行机详情
     @handler ResourceAgentDetailV2
     get /detail/v2/:id (ResourceAgentDetailV2Req) returns (ResourceAgentDetailV2Resp)
-    // 执行机详情
+    // 执行机可选创建
     @handler ResourceAgentSelectOptions
     post /select/options (ResourceAgentSelectOptionsReq) returns (ResourceAgentSelectOptionsResp)
+
 }

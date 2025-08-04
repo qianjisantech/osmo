@@ -42,13 +42,14 @@ func newGosmoTaskRecord(db *gorm.DB, opts ...gen.DOOption) gosmoTaskRecord {
 	_gosmoTaskRecord.UpdateByName = field.NewString(tableName, "update_by_name")
 	_gosmoTaskRecord.RuleID = field.NewInt64(tableName, "rule_id")
 	_gosmoTaskRecord.RuleName = field.NewString(tableName, "rule_name")
-	_gosmoTaskRecord.StrategyID = field.NewInt64(tableName, "strategy_id")
+	_gosmoTaskRecord.StrategyCode = field.NewString(tableName, "strategy_code")
 	_gosmoTaskRecord.StrategyName = field.NewString(tableName, "strategy_name")
-	_gosmoTaskRecord.AgentID = field.NewInt64(tableName, "agent_id")
+	_gosmoTaskRecord.AgentID = field.NewString(tableName, "agent_id")
 	_gosmoTaskRecord.AgentName = field.NewString(tableName, "agent_name")
 	_gosmoTaskRecord.StartTime = field.NewTime(tableName, "start_time")
 	_gosmoTaskRecord.EndTime = field.NewTime(tableName, "end_time")
 	_gosmoTaskRecord.Description = field.NewString(tableName, "description")
+	_gosmoTaskRecord.ListenPort = field.NewString(tableName, "listen_port")
 
 	_gosmoTaskRecord.fillFieldMap()
 
@@ -74,13 +75,14 @@ type gosmoTaskRecord struct {
 	UpdateByName  field.String
 	RuleID        field.Int64  // 规则id
 	RuleName      field.String // 规则名称
-	StrategyID    field.Int64  // 策略id
+	StrategyCode  field.String
 	StrategyName  field.String // 策略名称
-	AgentID       field.Int64
+	AgentID       field.String
 	AgentName     field.String
 	StartTime     field.Time
 	EndTime       field.Time
 	Description   field.String // 描述
+	ListenPort    field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -112,13 +114,14 @@ func (g *gosmoTaskRecord) updateTableName(table string) *gosmoTaskRecord {
 	g.UpdateByName = field.NewString(table, "update_by_name")
 	g.RuleID = field.NewInt64(table, "rule_id")
 	g.RuleName = field.NewString(table, "rule_name")
-	g.StrategyID = field.NewInt64(table, "strategy_id")
+	g.StrategyCode = field.NewString(table, "strategy_code")
 	g.StrategyName = field.NewString(table, "strategy_name")
-	g.AgentID = field.NewInt64(table, "agent_id")
+	g.AgentID = field.NewString(table, "agent_id")
 	g.AgentName = field.NewString(table, "agent_name")
 	g.StartTime = field.NewTime(table, "start_time")
 	g.EndTime = field.NewTime(table, "end_time")
 	g.Description = field.NewString(table, "description")
+	g.ListenPort = field.NewString(table, "listen_port")
 
 	g.fillFieldMap()
 
@@ -147,7 +150,7 @@ func (g *gosmoTaskRecord) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (g *gosmoTaskRecord) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 22)
+	g.fieldMap = make(map[string]field.Expr, 23)
 	g.fieldMap["id"] = g.ID
 	g.fieldMap["name"] = g.Name
 	g.fieldMap["status"] = g.Status
@@ -163,13 +166,14 @@ func (g *gosmoTaskRecord) fillFieldMap() {
 	g.fieldMap["update_by_name"] = g.UpdateByName
 	g.fieldMap["rule_id"] = g.RuleID
 	g.fieldMap["rule_name"] = g.RuleName
-	g.fieldMap["strategy_id"] = g.StrategyID
+	g.fieldMap["strategy_code"] = g.StrategyCode
 	g.fieldMap["strategy_name"] = g.StrategyName
 	g.fieldMap["agent_id"] = g.AgentID
 	g.fieldMap["agent_name"] = g.AgentName
 	g.fieldMap["start_time"] = g.StartTime
 	g.fieldMap["end_time"] = g.EndTime
 	g.fieldMap["description"] = g.Description
+	g.fieldMap["listen_port"] = g.ListenPort
 }
 
 func (g gosmoTaskRecord) clone(db *gorm.DB) gosmoTaskRecord {

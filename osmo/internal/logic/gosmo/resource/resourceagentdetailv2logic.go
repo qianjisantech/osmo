@@ -56,7 +56,7 @@ func (l *ResourceAgentDetailV2Logic) ResourceAgentDetailV2(req *types.ResourceAg
 	if agent.LastReportTime != nil {
 		lastReportTime = agent.LastReportTime.Format(time.DateTime)
 	}
-	tasks, err := l.queryResourceTasksByAgentId(id)
+	tasks, err := l.queryResourceTasksByAgentId(req.ID)
 	if err != nil {
 		return nil, errorx.NewDefaultErrorf("获取任务列表出错: %s", err)
 	}
@@ -94,7 +94,7 @@ func (l *ResourceAgentDetailV2Logic) ResourceAgentDetailV2(req *types.ResourceAg
 		},
 	}, nil
 }
-func (l *ResourceAgentDetailV2Logic) queryResourceTasksByAgentId(id int64) ([]types.ResourceAgentDetailV2RespDataTask, error) {
+func (l *ResourceAgentDetailV2Logic) queryResourceTasksByAgentId(id string) ([]types.ResourceAgentDetailV2RespDataTask, error) {
 	q := query.GosmoTaskRecord
 	records, err := q.WithContext(l.ctx).Debug().Where(q.AgentID.Eq(id)).Find()
 	if err != nil {
@@ -124,10 +124,8 @@ func (l *ResourceAgentDetailV2Logic) queryResourceTasksByAgentId(id int64) ([]ty
 			EndTime:      endTime,
 			Description:  description,
 			Type:         "record",
-			RuleName:     record.RuleName,
-			RuleId:       strconv.FormatInt(record.RuleID, 10),
 			StrategyName: record.StrategyName,
-			StrategyId:   strconv.FormatInt(record.StrategyID, 10),
+			StrategyId:   record.StrategyCode,
 		}
 	}
 	return tasks, nil

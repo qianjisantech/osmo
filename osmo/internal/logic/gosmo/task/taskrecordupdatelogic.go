@@ -36,10 +36,7 @@ func (l *TaskRecordUpdateLogic) TaskRecordUpdate(req *types.TaskRecordUpdateReq)
 	if req.StrategyName == "" || req.StrategyId == "" {
 		return nil, errorx.NewDefaultError("录制策略不能为空")
 	}
-	if req.RuleId == "" || req.RuleName == "" {
-		return nil, errorx.NewDefaultError("录制规则不能为空")
-	}
-	if req.AgentId == "" || req.AgentName == "" {
+	if req.AgentId == "" {
 		return nil, errorx.NewDefaultError("录制任务需要关联执行机")
 	}
 	//  转换ID类型
@@ -71,10 +68,6 @@ func (l *TaskRecordUpdateLogic) TaskRecordUpdate(req *types.TaskRecordUpdateReq)
 	if err != nil {
 		return nil, errorx.NewCodeErrorf("策略id不合法: %v", err)
 	}
-	ruleId, err := strconv.ParseInt(req.RuleId, 10, 64)
-	if err != nil {
-		return nil, errorx.NewCodeErrorf("规则id不合法: %v", err)
-	}
 	agentId, err := strconv.ParseInt(req.AgentId, 10, 64)
 	if err != nil {
 		return nil, errorx.NewCodeErrorf("执行机id不合法: %v", err)
@@ -84,11 +77,9 @@ func (l *TaskRecordUpdateLogic) TaskRecordUpdate(req *types.TaskRecordUpdateReq)
 		ID:           id,
 		Name:         req.Name,
 		Description:  description,
-		StrategyID:   strategyId,
+		StrategyCode: strconv.FormatInt(strategyId, 10),
 		StrategyName: req.StrategyName,
-		RuleID:       ruleId,
-		RuleName:     req.RuleName,
-		AgentID:      agentId,
+		AgentID:      strconv.FormatInt(agentId, 10),
 		AgentName:    req.AgentName,
 	}
 

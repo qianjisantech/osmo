@@ -29,14 +29,13 @@ type (
         Id string `json:"id"`                              // 录制任务Id
         Name string `json:"name"`                          // 录制任务名称
         Status string `json:"status"`
-        RuleId string `json:"rule_id"`
-        RuleName string `json:"rule_name"`
-        StrategyId string `json:"strategy_id"`
+        StrategyCode string `json:"strategy_code"`
         StrategyName string `json:"strategy_name"`
         StartTime string `json:"start_time"`
         EndTime string `json:"end_time"`
         AgentId  string  `json:"agent_id"`
         AgentName string `json:"agent_name"`
+        ListenPort string `json:"listen_port"`
     }
         // TaskRecordQueryPageRespData 查询返回数据
     TaskRecordQueryPageRespData {
@@ -47,12 +46,21 @@ type (
 
         Name string `json:"name"`                                   // 录制任务名称
         Description string `json:"description,optional"`            // 描述信息
-        StrategyId string `json:"strategy_id"`                      // 录制策略id
-        StrategyName string `json:"strategy_name"`                  // 录制策略名称
-        RuleId string `json:"rule_id"`                              // 录制规则Id
-        RuleName string `json:"rule_name"`                          // 录制规则名称
-        AgentId  string  `json:"agent_id"`
-        AgentName string `json:"agent_name"`
+        Strategy *TaskRecordCreateReqStrategy `json:"strategy"`                      // 录制策略id
+        Agent  *TaskRecordCreateReqAgent  `json:"agent"`
+        RecordTime []string `json:"record_time"`
+        ListenPort string    `json:"listen_port"`
+    }
+    TaskRecordCreateReqStrategy {
+        Id string `json:"id"`
+        Name string `json:"name"`
+        Value string `json:"value"`
+    }
+    TaskRecordCreateReqAgent {
+        Id string `json:"id"`
+        Key string `json:"key"`
+        Value string `json:"value"`
+        ExecuteStatus string `json:"execute_status"`
     }
     TaskRecordCreateResp {
         Success bool `json:"success"`
@@ -65,8 +73,6 @@ type (
         Description string `json:"description,optional"`            // 描述信息
         StrategyId string `json:"strategy_id"`                      // 录制策略id
         StrategyName string `json:"strategy_name"`                  // 录制策略名称
-        RuleId string `json:"rule_id"`                              // 录制规则Id
-        RuleName string `json:"rule_name"`                          // 录制规则名称
         AgentId  string  `json:"agent_id"`
         AgentName string `json:"agent_name"`
     }
@@ -87,8 +93,6 @@ type (
         Name string `json:"name"`                          // 录制任务名称
         Description string `json:"description"`            // 描述信息
         Status string `json:"status"`
-        RuleId string `json:"rule_id"`
-        RuleName string `json:"rule_name"`
         StrategyId string `json:"strategy_id"`
         StrategyName string `json:"strategy_name"`
         StartTime string `json:"start_time"`
@@ -101,6 +105,12 @@ type (
         UpdateByName string `json:"update_by_name"`
         AgentId  string  `json:"agent_id"`
         AgentName string `json:"agent_name"`
+    }
+    TaskRecordExecuteReq {
+        ID string `path:"id"`
+    }
+    TaskRecordExecuteResp {
+        ID string `path:"id"`
     }
 )
 
@@ -121,4 +131,6 @@ service osmo-api {
     // 录制任务编辑页详情
     @handler TaskRecordDetail
     get /detail/:id (TaskRecordDetailReq) returns (TaskRecordDetailResp)
+    @handler  TaskRecordExecute
+    post /execute (TaskRecordExecuteReq) returns (TaskRecordExecuteResp)
 }

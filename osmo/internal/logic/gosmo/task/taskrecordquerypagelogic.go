@@ -81,18 +81,20 @@ func (l *TaskRecordQueryPageLogic) TaskRecordQueryPage(req *types.TaskRecordQuer
 		if taskRecord.StartTime != nil {
 			startTime = taskRecord.StartTime.Format(time.DateTime)
 		}
+		if taskRecord.EndTime != nil {
+			endTime = taskRecord.EndTime.Format(time.DateTime)
+		}
 		records = append(records, types.TaskRecordQueryPageRespRecord{
 			Id:           strconv.FormatInt(taskRecord.ID, 10),
 			Name:         taskRecord.Name,
-			StrategyId:   strconv.FormatInt(taskRecord.StrategyID, 10),
+			StrategyCode: taskRecord.StrategyCode,
 			StrategyName: taskRecord.StrategyName,
-			RuleId:       strconv.FormatInt(taskRecord.RuleID, 10),
-			RuleName:     taskRecord.RuleName,
-			AgentId:      strconv.FormatInt(taskRecord.AgentID, 10),
+			AgentId:      taskRecord.AgentID,
 			AgentName:    taskRecord.AgentName,
 			Status:       taskRecord.Status,
 			StartTime:    startTime,
 			EndTime:      endTime,
+			ListenPort:   taskRecord.ListenPort,
 		})
 	}
 

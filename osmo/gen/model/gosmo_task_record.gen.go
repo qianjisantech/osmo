@@ -25,15 +25,16 @@ type GosmoTaskRecord struct {
 	UpdateTime    time.Time  `gorm:"column:update_time;not null;default:CURRENT_TIMESTAMP;->" json:"update_time"`
 	UpdateBy      string     `gorm:"column:update_by;not null" json:"update_by"`
 	UpdateByName  string     `gorm:"column:update_by_name;not null" json:"update_by_name"`
-	RuleID        int64      `gorm:"column:rule_id;not null;comment:规则id" json:"rule_id"`             // 规则id
-	RuleName      string     `gorm:"column:rule_name;not null;comment:规则名称" json:"rule_name"`         // 规则名称
-	StrategyID    int64      `gorm:"column:strategy_id;not null;comment:策略id" json:"strategy_id"`     // 策略id
+	RuleID        *int64     `gorm:"column:rule_id;comment:规则id" json:"rule_id"`     // 规则id
+	RuleName      *string    `gorm:"column:rule_name;comment:规则名称" json:"rule_name"` // 规则名称
+	StrategyCode  string     `gorm:"column:strategy_code;not null" json:"strategy_code"`
 	StrategyName  string     `gorm:"column:strategy_name;not null;comment:策略名称" json:"strategy_name"` // 策略名称
-	AgentID       int64      `gorm:"column:agent_id;not null" json:"agent_id"`
+	AgentID       string     `gorm:"column:agent_id;not null" json:"agent_id"`
 	AgentName     string     `gorm:"column:agent_name;not null" json:"agent_name"`
 	StartTime     *time.Time `gorm:"column:start_time" json:"start_time"`
 	EndTime       *time.Time `gorm:"column:end_time" json:"end_time"`
 	Description   *string    `gorm:"column:description;comment:描述" json:"description"` // 描述
+	ListenPort    string     `gorm:"column:listen_port;not null" json:"listen_port"`
 }
 
 // TableName GosmoTaskRecord's table name
