@@ -1,0 +1,205 @@
+syntax = "v1"
+
+info(
+    title: "osmo后端"
+    desc: "osmo后端"
+    author: "philip.shen"
+    email: "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+type (
+    //  ResourceAgentQueryPageReq 执行机分页查询入参
+    ResourceAgentQueryPageReq {
+        PageSize int `json:"page_size"`          //页最大数量
+        Page int `json:"page"`                   //当前页
+        Keyword string `json:"keyword"`          // 关键字
+        ExecuteStatus string `json:"execute_status,optional"`
+        Status string `json:"status,optional"`   // 状态 (offline:离线, healthy:健康, warning:警告, error:异常 created:待部署)
+    }
+        //  ResourceAgentQueryPageResp 执行机分页查询返回体
+    ResourceAgentQueryPageResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data ResourceAgentQueryPageRespData `json:"data"`
+    }
+        // ResourceAgentQueryPageRespRecord 执行机Record信息
+    ResourceAgentQueryPageRespRecord {
+        ID string `json:"id"`                              // 执行机ID
+        Name string `json:"name"`                          // 执行机名称
+        IP string `json:"ip"`                              // IP地址
+        Description string `json:"description"`            // 描述信息
+        ExecuteStatus string    `json:"execute_status"`
+        Status string `json:"status"`                      // 状态 (offline:离线, healthy:健康, warning:警告, error:异常 created:待部署)
+        LastReportTime string `json:"last_report_time"`    // 最后上报时间
+        StartTime string `json:"start_time"`
+        StopTime string `json:"stop_time"`
+        CPUCores int `json:"cpu_cores"`
+        CPUUsedPercent float64 `json:"cpu_used_percent"`
+        CPUFreePercent float64 ` json:"cpu_free_percent"`
+        MemoryTotal float64 ` json:"memory_total"`
+        MemoryUsed float64 ` json:"memory_used"`
+        MemoryFree float64 ` json:"memory_free"`
+        MemoryUsedPercent float64 ` json:"memory_used_percent"`
+        NetworkBytesSent float64 ` json:"network_bytes_sent"`
+        NetworkBytesReceive float64 `json:"network_bytes_receive"`
+        NetworkPacketsSent float64 ` json:"network_packets_sent"`
+        NetworkPacketsReceive float64 ` json:"network_packets_receive"`
+    }
+
+        // ResourceAgentQueryPageRespBoard 执行机状态看板
+    ResourceAgentQueryPageRespBoard {
+        Total int `json:"total"`      // 总数
+        Healthy int `json:"healthy"`  // 健康数量
+        Warning int `json:"warning"`  // 警告数量
+        Error int `json:"error"`      // 异常数量
+        Offline int `json:"offline"`  // 离线数量
+    }
+
+        // ResourceAgentQueryPageRespData 查询返回数据
+    ResourceAgentQueryPageRespData {
+        Board ResourceAgentQueryPageRespBoard `json:"board"`         // 状态看板
+        Total int `json:"total"`                                     // 总数
+        Records []ResourceAgentQueryPageRespRecord `json:"records"`  // 记录列表
+    }
+    ResourceAgentCreateReq {
+        Name string `json:"name"`                                   // 执行机名称
+        Description string `json:"description,optional"`            // 描述信息
+        SelectedAgentId string `json:"selected_agent_id"`
+    }
+    ResourceAgentCreateResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+
+    ResourceAgentUpdateReq {
+        Id string `json:"id"`
+        Name string `json:"name"`                                   // 执行机名称
+        Description string `json:"description,optional"`            // 描述信息
+    }
+    ResourceAgentUpdateResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+    ResourceAgentDetailReq {
+        ID string `path:"id"`  // 关键点：path 标签表示路径参数
+    }
+    ResourceAgentDetailResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data ResourceAgentDetailRespData `json:"data" `
+    }
+    ResourceAgentDetailRespData {
+        ID string `json:"id"`                              // 执行机ID
+        Name string `json:"name"`                          // 执行机名称
+        Description string `json:"description"`            // 描述信息
+    }
+    ResourceAgentConsoleReq {
+        ID string `path:"id`
+    }
+    ResourceAgentConsoleResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data ResourceAgentDetailRespData `json:"data" `
+    }
+    ResourceAgentConsoleRespData {
+        ID string `json:"id"`                              // 执行机ID
+        Name string `json:"name"`                          // 执行机名称
+        Description string `json:"description"`            // 描述信息
+        Ip string `json:"ip"`
+        Cpu int `json:"cpu"`
+        Memory int `json:"memory"`
+        Network int `json:"network"`
+        Disk int `json:"disk"`
+        Status string `json:"status"`
+        LastReportTime string `json:"last_report_time"`
+    }
+    ResourceAgentDetailV2Req {
+        ID string `path:"id"`  // 关键点：path 标签表示路径参数
+    }
+    ResourceAgentDetailV2Resp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data ResourceAgentDetailV2RespData `json:"data" `
+    }
+    ResourceAgentDetailV2RespData {
+        ID string `json:"id"`                              // 执行机ID
+        Name string `json:"name"`                          // 执行机名称
+        Description string `json:"description"`            // 描述信息
+        Ip string `json:"ip"`
+        StartTime string `json:"start_time"`
+        StopTime string `json:"stop_time"`
+        CPUCores int `json:"cpu_cores"`
+        CPUUsedPercent float64 `json:"cpu_used_percent"`
+        CPUFreePercent float64 ` json:"cpu_free_percent"`
+        MemoryTotal float64 ` json:"memory_total"`
+        MemoryUsed float64 ` json:"memory_used"`
+        MemoryFree float64 ` json:"memory_free"`
+        MemoryUsedPercent float64 ` json:"memory_used_percent"`
+        NetworkBytesSent float64 ` json:"network_bytes_sent"`
+        NetworkBytesReceive float64 `json:"network_bytes_receive"`
+        NetworkPacketsSent float64 ` json:"network_packets_sent"`
+        NetworkPacketsReceive float64 ` json:"network_packets_receive"`
+        Status string `json:"status"`
+        LastReportTime string `json:"last_report_time"`
+        IdentificationCode string `json:"identification_code"`
+        Tasks []ResourceAgentDetailV2RespDataTask `json:"tasks"`
+    }
+    ResourceAgentDetailV2RespDataTask {
+        ID string `json:"id"`
+        Name string `json:"name"`
+        Description string `json:"description"`
+        Status string `json:"status"`
+        StartTime string `json:"start_time"`
+        EndTime string `json:"end_time"`
+        Type string `json:"type"`
+        RuleId string `json:"rule_id"`
+        RuleName string `json:"rule_name"`
+        StrategyId string `json:"strategy_id"`
+        StrategyName string `json:"strategy_name"`
+    }
+    ResourceAgentSelectOptionsReq {
+     Keyword string    `json:"keyword,optional"`
+         Status []string    `json:"status,optional"`
+     ExecuteStatus []string `json:"execute_status,optional"`
+    }
+    ResourceAgentSelectOptionsResp{
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data []ResourceAgentSelectOptionsRespData `json:"data" `
+    }
+    ResourceAgentSelectOptionsRespData{
+        Id string `json:"id"`
+        Key string  `json:"key"`
+        Value string  `json:"value"`
+        ExecuteStatus string `json:"execute_status"`
+    }
+)
+
+@server(
+    group: polaris/resource
+    prefix: /api/polaris/resource/agent
+)
+service osmo-api {
+    // 执行机分页查询
+    @handler ResourceAgentQueryPage
+    post /page (ResourceAgentQueryPageReq) returns (ResourceAgentQueryPageResp)
+    // 创建执行机
+    @handler ResourceAgentCreate
+    post /create (ResourceAgentCreateReq) returns (ResourceAgentCreateResp)
+    // 更新执行机
+    @handler ResourceAgentUpdate
+    post /update (ResourceAgentUpdateReq) returns (ResourceAgentUpdateResp)
+    // 执行机编辑页详情
+    @handler ResourceAgentDetail
+    get /detail/:id (ResourceAgentDetailReq) returns (ResourceAgentDetailResp)
+    // 执行机控制台
+    @handler ResourceAgentConsole
+    get /console/:id (ResourceAgentConsoleReq) returns (ResourceAgentConsoleResp)
+    // 执行机详情
+    @handler ResourceAgentDetailV2
+    get /detail/v2/:id (ResourceAgentDetailV2Req) returns (ResourceAgentDetailV2Resp)
+    // 执行机可选创建
+    @handler ResourceAgentSelectOptions
+    post /select/options (ResourceAgentSelectOptionsReq) returns (ResourceAgentSelectOptionsResp)
+
+}

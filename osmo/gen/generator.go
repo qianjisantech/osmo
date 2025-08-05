@@ -32,10 +32,11 @@ func main() {
 
 	// Tables to generate
 	tables := []string{
-		"gosmo_resource_agent",
-		"gosmo_task_replay",
-		"gosmo_task_record",
+		"polaris_resource_agent",
+		"polaris_task_replay",
+		"polaris_task_record",
 		"polaris_traffic_pool",
+		"polaris_monitor_center",
 	}
 
 	// Apply configurations to all tables

@@ -72,10 +72,24 @@ type (
     DiscoveryHeatBeatRespData {
         Id string  `json:"id"`
         Name string  `json:"name"`
+        Tasks []DiscoveryHeatBeatRespDataTask `json:"tasks"`
     }
-
+    DiscoveryHeatBeatRespDataTask{
+        Id string `json:"id"`
+        Name string `json:"name"`
+        Status string `json:"status"`
+        ListenPort int `json:"listen_port"`
+        CreateTime string `json:"create_time"`
+        CreateBy string `json:"create_by"`
+        CreateByName string`json:"create_by_name"`
+        UpdateBy string `json:"update_by"`
+        UpdateByName string `json:"update_by_name"`
+        UpdateTime string `json:"update_time"`
+        StartTime string  `json:"start_time"`
+        EndTime string `json:"end_time"`
+        ExecuteTime  string `json:"execute_time"`
+    }
 )
-
 @server(
     group: discovery
     prefix: /polaris/v1/discovery

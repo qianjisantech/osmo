@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	auth "osmo/internal/handler/auth"
-	gosmoresource "osmo/internal/handler/gosmo/resource"
-	gosmotask "osmo/internal/handler/gosmo/task"
-	gosmotraffic "osmo/internal/handler/gosmo/traffic"
+	polarisresource "osmo/internal/handler/polaris/resource"
+	polaristask "osmo/internal/handler/polaris/task"
+	polaristraffic "osmo/internal/handler/polaris/traffic"
 	system "osmo/internal/handler/system"
 	"osmo/internal/svc"
 
@@ -41,40 +41,40 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodGet,
 				Path:    "/console/:id",
-				Handler: gosmoresource.ResourceAgentConsoleHandler(serverCtx),
+				Handler: polarisresource.ResourceAgentConsoleHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/create",
-				Handler: gosmoresource.ResourceAgentCreateHandler(serverCtx),
+				Handler: polarisresource.ResourceAgentCreateHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
 				Path:    "/detail/:id",
-				Handler: gosmoresource.ResourceAgentDetailHandler(serverCtx),
+				Handler: polarisresource.ResourceAgentDetailHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
 				Path:    "/detail/v2/:id",
-				Handler: gosmoresource.ResourceAgentDetailV2Handler(serverCtx),
+				Handler: polarisresource.ResourceAgentDetailV2Handler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/page",
-				Handler: gosmoresource.ResourceAgentQueryPageHandler(serverCtx),
+				Handler: polarisresource.ResourceAgentQueryPageHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/select/options",
-				Handler: gosmoresource.ResourceAgentSelectOptionsHandler(serverCtx),
+				Handler: polarisresource.ResourceAgentSelectOptionsHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/update",
-				Handler: gosmoresource.ResourceAgentUpdateHandler(serverCtx),
+				Handler: polarisresource.ResourceAgentUpdateHandler(serverCtx),
 			},
 		},
-		rest.WithPrefix("/api/gosmo/resource/agent"),
+		rest.WithPrefix("/api/polaris/resource/agent"),
 	)
 
 	server.AddRoutes(
@@ -82,25 +82,30 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/create",
-				Handler: gosmotask.TaskRecordCreateHandler(serverCtx),
+				Handler: polaristask.TaskRecordCreateHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
 				Path:    "/detail/:id",
-				Handler: gosmotask.TaskRecordDetailHandler(serverCtx),
+				Handler: polaristask.TaskRecordDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/execute/:id",
+				Handler: polaristask.TaskRecordExecuteHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/page",
-				Handler: gosmotask.TaskRecordQueryPageHandler(serverCtx),
+				Handler: polaristask.TaskRecordQueryPageHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/update",
-				Handler: gosmotask.TaskRecordUpdateHandler(serverCtx),
+				Handler: polaristask.TaskRecordUpdateHandler(serverCtx),
 			},
 		},
-		rest.WithPrefix("/api/gosmo/task/record"),
+		rest.WithPrefix("/api/polaris/task/record"),
 	)
 
 	server.AddRoutes(
@@ -108,15 +113,15 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodGet,
 				Path:    "/detail/:id",
-				Handler: gosmotraffic.TrafficPoolDetailHandler(serverCtx),
+				Handler: polaristraffic.TrafficPoolDetailHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/page",
-				Handler: gosmotraffic.TrafficPoolQueryPageHandler(serverCtx),
+				Handler: polaristraffic.TrafficPoolQueryPageHandler(serverCtx),
 			},
 		},
-		rest.WithPrefix("/api/gosmo/traffic/pool"),
+		rest.WithPrefix("/api/polaris/traffic/pool"),
 	)
 
 	server.AddRoutes(

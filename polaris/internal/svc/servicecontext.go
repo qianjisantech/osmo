@@ -2,7 +2,9 @@ package svc
 
 import (
 	"context"
+	"fmt"
 	"github.com/segmentio/kafka-go"
+	"polaris/binlog"
 	"polaris/common/kafka/core"
 	"sync"
 	"time"
@@ -17,12 +19,13 @@ import (
 )
 
 type ServiceContext struct {
-	Config       config.Config
-	DB           *gorm.DB
-	Kafka        *core.KafkaConsumer
-	msgCh        <-chan kafka.Message
-	errCh        <-chan error
-	shutdownOnce sync.Once
+	Config        config.Config
+	DB            *gorm.DB
+	Kafka         *core.KafkaConsumer
+	msgCh         <-chan kafka.Message
+	errCh         <-chan error
+	shutdownOnce  sync.Once
+	BinlogWatcher *binlog.BinlogWatcher
 }
 
 // 实现gorm的logger.Writer接口
@@ -38,13 +41,40 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	kaf := initKafka(c)
 	// 4. 设置GORM查询生成器
 	query.SetDefault(db)
+	var binLogTables []binlog.BinLogTableConfig
+	for _, table := range c.Mysql.BinLogTables {
+		binLogTables = append(binLogTables, binlog.BinLogTableConfig{
+			Name:   table.Name,
+			Fields: table.Fields,
+		})
+	}
 
+	// 初始化binlog监听器
+	watcher, err := binlog.NewWatcher(binlog.BinLogConfig{
+		Addr:     c.Mysql.Addr,
+		Database: c.Mysql.DbName,
+		Tables:   binLogTables,
+		User:     c.Mysql.User,
+		Password: c.Mysql.Password,
+	})
+	if err != nil {
+		panic(err)
+	}
+	// 注册处理函数
+	watcher.AddHandler(func(dbName, tableName, columnName string, oldVal, newVal interface{}, fullRow map[string]interface{}) {
+		binlog.WatcherEngine(dbName, tableName, columnName, oldVal, newVal, fullRow)
+	})
+	// 启动监听
+	if err := watcher.Start(); err != nil {
+		panic(err)
+	}
 	logx.Infof("ServiceContext initialized successfully")
 
 	return &ServiceContext{
-		Config: c,
-		DB:     db,
-		Kafka:  kaf,
+		Config:        c,
+		DB:            db,
+		Kafka:         kaf,
+		BinlogWatcher: watcher,
 	}
 }
 func initKafka(c config.Config) *core.KafkaConsumer {
@@ -78,8 +108,9 @@ func initGorm(c config.Config) *gorm.DB {
 	if c.Mysql.OpenDebugLog {
 		gormLog.LogMode(logger.Info)
 	}
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.Mysql.User, c.Mysql.Password, c.Mysql.Addr, c.Mysql.DbName)
 
-	db, err := gorm.Open(mysql.Open(c.Mysql.Datasource), &gorm.Config{
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
 		Logger:                 gormLog,

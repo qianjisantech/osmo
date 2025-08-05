@@ -2,14 +2,11 @@ package svc
 
 import (
 	"context"
-	"github.com/qianjisantech/gosmo-agent/gen/query"
 	"github.com/qianjisantech/gosmo-agent/internal/config"
 	"github.com/qianjisantech/gosmo-agent/task"
 	"github.com/qianjisantech/polaris-discovery-sdk/core"
 	"github.com/shirou/gopsutil/v3/process"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"sync"
@@ -80,37 +77,16 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	monitor := &ResourceMonitor{}
 	monitor.Start()
 
-	// 初始化数据库连接
-	db, err := gorm.Open(sqlite.Open(c.Sqlite.DataSourceName), &gorm.Config{
-		SkipDefaultTransaction: true,
-		PrepareStmt:            true,
-		Logger: logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags),
-			logger.Config{
-				SlowThreshold:             time.Second,
-				LogLevel:                  logger.Silent,
-				IgnoreRecordNotFoundError: true,
-				Colorful:                  false,
-			},
-		),
-	})
-	if err != nil {
-		panic("创建数据库连接失败: " + err.Error())
-	}
-
-	sqlDB, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-
-	// 优化数据库连接池
-	sqlDB.SetMaxOpenConns(2)
-	sqlDB.SetMaxIdleConns(1)
-	sqlDB.SetConnMaxLifetime(time.Hour)
-	query.SetDefault(db)
 	client := &core.DiscoveryClient{Addr: c.Polaris.Discovery.Addr, HeartbeatInterval: c.Polaris.Discovery.HeartbeatInterval, Timeout: c.Polaris.Discovery.Timeout}
 	log.Printf("判断客户端是否已经启动%v", client.IsStopped())
-	err = client.Start(
+	scvt := &ServiceContext{
+		Config:          c,
+		ShutdownChan:    make(chan struct{}),
+		TaskCounter:     &TaskCounter{MaxTasks: maxConcurrent},
+		ResourceMonitor: monitor,
+		TaskManager:     task.NewTaskManager(10),
+	}
+	err := client.Start(
 		func(resp *core.RegisterResponse) {
 			log.Printf("===============================注册成功回调方法! ID: %s", resp.Data.Id)
 		},
@@ -119,6 +95,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		},
 		func(resp *core.HeatBeatResponse) {
 			log.Printf("===============================心跳成功回调方法 id: %s", resp.Data.Id)
+			log.Printf("===============================心跳成功回调方法 找到执行的任务: %v", resp)
+			err := HeartBeatCallback(scvt, resp)
+			if err != nil {
+				log.Printf("启动任务失败%s", err)
+			}
 		},
 		func(err error) {
 			log.Printf("===============================心跳失败回调方法 : %v", err)
@@ -128,14 +109,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	if err != nil {
 		log.Printf("===============================注册中心启动失败 : %v", err)
 	}
-	return &ServiceContext{
-		Config:          c,
-		SqliteDB:        db,
-		ShutdownChan:    make(chan struct{}),
-		TaskCounter:     &TaskCounter{MaxTasks: maxConcurrent},
-		ResourceMonitor: monitor,
-		TaskManager:     task.NewTaskManager(10),
-	}
+
+	return scvt
 }
 
 // TaskCounter 方法实现...

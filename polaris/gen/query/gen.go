@@ -16,39 +16,44 @@ import (
 )
 
 var (
-	Q                  = new(Query)
-	GosmoResourceAgent *gosmoResourceAgent
-	PolarisTrafficPool *polarisTrafficPool
+	Q                    = new(Query)
+	PolarisResourceAgent *polarisResourceAgent
+	PolarisTaskRecord    *polarisTaskRecord
+	PolarisTrafficPool   *polarisTrafficPool
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
-	GosmoResourceAgent = &Q.GosmoResourceAgent
+	PolarisResourceAgent = &Q.PolarisResourceAgent
+	PolarisTaskRecord = &Q.PolarisTaskRecord
 	PolarisTrafficPool = &Q.PolarisTrafficPool
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:                 db,
-		GosmoResourceAgent: newGosmoResourceAgent(db, opts...),
-		PolarisTrafficPool: newPolarisTrafficPool(db, opts...),
+		db:                   db,
+		PolarisResourceAgent: newPolarisResourceAgent(db, opts...),
+		PolarisTaskRecord:    newPolarisTaskRecord(db, opts...),
+		PolarisTrafficPool:   newPolarisTrafficPool(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	GosmoResourceAgent gosmoResourceAgent
-	PolarisTrafficPool polarisTrafficPool
+	PolarisResourceAgent polarisResourceAgent
+	PolarisTaskRecord    polarisTaskRecord
+	PolarisTrafficPool   polarisTrafficPool
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:                 db,
-		GosmoResourceAgent: q.GosmoResourceAgent.clone(db),
-		PolarisTrafficPool: q.PolarisTrafficPool.clone(db),
+		db:                   db,
+		PolarisResourceAgent: q.PolarisResourceAgent.clone(db),
+		PolarisTaskRecord:    q.PolarisTaskRecord.clone(db),
+		PolarisTrafficPool:   q.PolarisTrafficPool.clone(db),
 	}
 }
 
@@ -62,21 +67,24 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:                 db,
-		GosmoResourceAgent: q.GosmoResourceAgent.replaceDB(db),
-		PolarisTrafficPool: q.PolarisTrafficPool.replaceDB(db),
+		db:                   db,
+		PolarisResourceAgent: q.PolarisResourceAgent.replaceDB(db),
+		PolarisTaskRecord:    q.PolarisTaskRecord.replaceDB(db),
+		PolarisTrafficPool:   q.PolarisTrafficPool.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	GosmoResourceAgent IGosmoResourceAgentDo
-	PolarisTrafficPool IPolarisTrafficPoolDo
+	PolarisResourceAgent IPolarisResourceAgentDo
+	PolarisTaskRecord    IPolarisTaskRecordDo
+	PolarisTrafficPool   IPolarisTrafficPoolDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		GosmoResourceAgent: q.GosmoResourceAgent.WithContext(ctx),
-		PolarisTrafficPool: q.PolarisTrafficPool.WithContext(ctx),
+		PolarisResourceAgent: q.PolarisResourceAgent.WithContext(ctx),
+		PolarisTaskRecord:    q.PolarisTaskRecord.WithContext(ctx),
+		PolarisTrafficPool:   q.PolarisTrafficPool.WithContext(ctx),
 	}
 }
 

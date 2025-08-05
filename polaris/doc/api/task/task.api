@@ -11,7 +11,7 @@ info
 
 type (
 
-    TaskRunCallBackReq {
+    AgentRecordTaskRunCallBackReq {
       Id string  `json:"id"`
       Status string  `json:"status"`
       Message string  `json:"message"`
@@ -19,10 +19,34 @@ type (
      Success bool `json:"success"`
       Timestamp string `json:"timestamp"`
     }
-    TaskRunCallBackResp {
+    AgentRecordTaskRunCallBackResp {
         Success bool `json:"success"`
         Message string `json:"message"`
         Data interface{} `json:"data"`
+    }
+    AgentRecordTaskSyncReq {
+        Id string  `json:"id"`
+        Name string `json:"name"`
+        Description string `json:"description,optional"`
+//        RecordTime []string `json:"record_time"`
+        ListenPort string    `json:"listen_port"`
+        Status string `json:"status"`
+        CreateTime string   `json:"create_time"`
+        UpdateTime string `json:"update_time"`
+        CreateBy string  `json:"create_by"`
+        CreateByName  string  `json:"create_by_name"`
+        UpdateBy  string  `json:"update_by"`
+        UpdateByName  string  `json:"update_by_name"`
+        StartTime string `json:"start_time"`
+        EndTime string `json:"end_time"`
+        AgentId  string  `json:"agent_id"`
+        AgentName string `json:"agent_name"`
+        ExecuteTime string `json:"execute_time"`
+        TaskType string `json:"task_type,optional"`
+    }
+    AgentRecordTaskSyncResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
     }
 )
 
@@ -31,6 +55,8 @@ type (
     prefix: /polaris/agent/task
 )
 service polaris-api {
-    @handler TaskRunCallBack
-    post /run/callback(TaskRunCallBackReq) returns (TaskRunCallBackResp)
+    @handler AgentRecordTaskRunCallBack
+    post /run/callback(AgentRecordTaskRunCallBackReq) returns (AgentRecordTaskRunCallBackResp)
+    @handler AgentRecordTaskSync
+    post /sync (AgentRecordTaskSyncReq) returns (AgentRecordTaskSyncResp)
 }

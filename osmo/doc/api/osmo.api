@@ -1,8 +1,8 @@
 import "auth/auth.api"
 import "system/user.api"
-import "gosmo/task_record.api"
-import "gosmo/resource_agent.api "
-import "gosmo/traffic_pool.api "
+import "polaris/task_record.api"
+import "polaris/resource_agent.api "
+import "polaris/traffic_pool.api "
 
 info
 (

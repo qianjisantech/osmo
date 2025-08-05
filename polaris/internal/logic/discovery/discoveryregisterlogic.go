@@ -29,7 +29,7 @@ func NewDiscoveryRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 func (l *DiscoveryRegisterLogic) DiscoveryRegister(req *types.DiscoveryRegisterReq) (resp *types.DiscoveryRegisterResp, err error) {
 
 	// 检查ip是否已存在
-	q := query.GosmoResourceAgent
+	q := query.PolarisResourceAgent
 	existing, err := q.WithContext(l.ctx).Debug().
 		Where(q.IP.Eq(req.IP)).Where(q.HostName.Eq(req.Hostname)).
 		First()
@@ -58,7 +58,7 @@ func (l *DiscoveryRegisterLogic) DiscoveryRegister(req *types.DiscoveryRegisterR
 		}, nil
 	} else {
 		// 创建执行机记录
-		agent := &model.GosmoResourceAgent{
+		agent := &model.PolarisResourceAgent{
 			IP:                    req.IP,
 			HostName:              req.Hostname,
 			CPUCores:              int32(req.CPUCores),

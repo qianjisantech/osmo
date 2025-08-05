@@ -189,6 +189,10 @@ github.com/qianjisantech/gosmo v0.0.3 h1:Hf8v1HvfYjRJjF5jNJ14kHuRJoXeHTR6Cb1CIfu
 github.com/qianjisantech/gosmo v0.0.3/go.mod h1:2piSqu+Fo2Y0xnaY+TfzUaSsiOcL5EAICBiQW5HOJ68=
 github.com/qianjisantech/polaris-discovery-sdk v0.0.8 h1:BRgjMI0PsrD6DJNCcCoefTVyrbmKFgunwryfEGeouJs=
 github.com/qianjisantech/polaris-discovery-sdk v0.0.8/go.mod h1:ASSEnB5v6RZmAKD1CrED3rbphrcjyoWK5DwNJNaVCCI=
+github.com/qianjisantech/polaris-discovery-sdk v0.0.9 h1:Gzg58R4YcJ2SztzOLxzIjmVU/4sjtE1P3jxlV+T86co=
+github.com/qianjisantech/polaris-discovery-sdk v0.0.9/go.mod h1:ASSEnB5v6RZmAKD1CrED3rbphrcjyoWK5DwNJNaVCCI=
+github.com/qianjisantech/polaris-discovery-sdk v0.1.0 h1:OIvbRx9Y0rGedg2UT0xvFKxQPKwF0pWctDSZSD5Mugk=
+github.com/qianjisantech/polaris-discovery-sdk v0.1.0/go.mod h1:ASSEnB5v6RZmAKD1CrED3rbphrcjyoWK5DwNJNaVCCI=
 github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 h1:N/ElC8H3+5XpJzTSTfLsJV/mx9Q9g7kxmchpfZyxgzM=
 github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=

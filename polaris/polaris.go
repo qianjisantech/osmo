@@ -53,7 +53,7 @@ func main() {
 	server := rest.MustNewServer(c.RestConf)
 	handler.RegisterHandlers(server, svcCtx)
 	defer server.Stop()
-
+	// 静态文件服务
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }

@@ -5,7 +5,7 @@ go 1.23.9
 require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
-	github.com/qianjisantech/polaris-discovery-sdk v0.0.8
+	github.com/qianjisantech/polaris-discovery-sdk v0.1.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/zeromicro/go-zero v1.8.1
 	gorm.io/driver/sqlite v1.4.3

@@ -14,7 +14,7 @@ func main() {
 		FieldNullable: true,
 	})
 
-	dsn := "root:123456@tcp(localhost:3306)/osmo?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai"
+	dsn := "root:123456@tcp(localhost:3306)/polaris?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai"
 	db, _ := gorm.Open(mysql.Open(dsn))
 	g.UseDB(db)
 	// Common field configurations
@@ -32,8 +32,9 @@ func main() {
 
 	// Tables to generate
 	tables := []string{
-		"gosmo_resource_agent",
+		"polaris_resource_agent",
 		"polaris_traffic_pool",
+		"polaris_task_record",
 	}
 
 	// Apply configurations to all tables

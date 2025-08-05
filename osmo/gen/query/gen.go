@@ -16,49 +16,54 @@ import (
 )
 
 var (
-	Q                  = new(Query)
-	GosmoResourceAgent *gosmoResourceAgent
-	GosmoTaskRecord    *gosmoTaskRecord
-	GosmoTaskReplay    *gosmoTaskReplay
-	PolarisTrafficPool *polarisTrafficPool
+	Q                    = new(Query)
+	PolarisMonitorCenter *polarisMonitorCenter
+	PolarisResourceAgent *polarisResourceAgent
+	PolarisTaskRecord    *polarisTaskRecord
+	PolarisTaskReplay    *polarisTaskReplay
+	PolarisTrafficPool   *polarisTrafficPool
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
-	GosmoResourceAgent = &Q.GosmoResourceAgent
-	GosmoTaskRecord = &Q.GosmoTaskRecord
-	GosmoTaskReplay = &Q.GosmoTaskReplay
+	PolarisMonitorCenter = &Q.PolarisMonitorCenter
+	PolarisResourceAgent = &Q.PolarisResourceAgent
+	PolarisTaskRecord = &Q.PolarisTaskRecord
+	PolarisTaskReplay = &Q.PolarisTaskReplay
 	PolarisTrafficPool = &Q.PolarisTrafficPool
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:                 db,
-		GosmoResourceAgent: newGosmoResourceAgent(db, opts...),
-		GosmoTaskRecord:    newGosmoTaskRecord(db, opts...),
-		GosmoTaskReplay:    newGosmoTaskReplay(db, opts...),
-		PolarisTrafficPool: newPolarisTrafficPool(db, opts...),
+		db:                   db,
+		PolarisMonitorCenter: newPolarisMonitorCenter(db, opts...),
+		PolarisResourceAgent: newPolarisResourceAgent(db, opts...),
+		PolarisTaskRecord:    newPolarisTaskRecord(db, opts...),
+		PolarisTaskReplay:    newPolarisTaskReplay(db, opts...),
+		PolarisTrafficPool:   newPolarisTrafficPool(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	GosmoResourceAgent gosmoResourceAgent
-	GosmoTaskRecord    gosmoTaskRecord
-	GosmoTaskReplay    gosmoTaskReplay
-	PolarisTrafficPool polarisTrafficPool
+	PolarisMonitorCenter polarisMonitorCenter
+	PolarisResourceAgent polarisResourceAgent
+	PolarisTaskRecord    polarisTaskRecord
+	PolarisTaskReplay    polarisTaskReplay
+	PolarisTrafficPool   polarisTrafficPool
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:                 db,
-		GosmoResourceAgent: q.GosmoResourceAgent.clone(db),
-		GosmoTaskRecord:    q.GosmoTaskRecord.clone(db),
-		GosmoTaskReplay:    q.GosmoTaskReplay.clone(db),
-		PolarisTrafficPool: q.PolarisTrafficPool.clone(db),
+		db:                   db,
+		PolarisMonitorCenter: q.PolarisMonitorCenter.clone(db),
+		PolarisResourceAgent: q.PolarisResourceAgent.clone(db),
+		PolarisTaskRecord:    q.PolarisTaskRecord.clone(db),
+		PolarisTaskReplay:    q.PolarisTaskReplay.clone(db),
+		PolarisTrafficPool:   q.PolarisTrafficPool.clone(db),
 	}
 }
 
@@ -72,27 +77,30 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:                 db,
-		GosmoResourceAgent: q.GosmoResourceAgent.replaceDB(db),
-		GosmoTaskRecord:    q.GosmoTaskRecord.replaceDB(db),
-		GosmoTaskReplay:    q.GosmoTaskReplay.replaceDB(db),
-		PolarisTrafficPool: q.PolarisTrafficPool.replaceDB(db),
+		db:                   db,
+		PolarisMonitorCenter: q.PolarisMonitorCenter.replaceDB(db),
+		PolarisResourceAgent: q.PolarisResourceAgent.replaceDB(db),
+		PolarisTaskRecord:    q.PolarisTaskRecord.replaceDB(db),
+		PolarisTaskReplay:    q.PolarisTaskReplay.replaceDB(db),
+		PolarisTrafficPool:   q.PolarisTrafficPool.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	GosmoResourceAgent IGosmoResourceAgentDo
-	GosmoTaskRecord    IGosmoTaskRecordDo
-	GosmoTaskReplay    IGosmoTaskReplayDo
-	PolarisTrafficPool IPolarisTrafficPoolDo
+	PolarisMonitorCenter IPolarisMonitorCenterDo
+	PolarisResourceAgent IPolarisResourceAgentDo
+	PolarisTaskRecord    IPolarisTaskRecordDo
+	PolarisTaskReplay    IPolarisTaskReplayDo
+	PolarisTrafficPool   IPolarisTrafficPoolDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		GosmoResourceAgent: q.GosmoResourceAgent.WithContext(ctx),
-		GosmoTaskRecord:    q.GosmoTaskRecord.WithContext(ctx),
-		GosmoTaskReplay:    q.GosmoTaskReplay.WithContext(ctx),
-		PolarisTrafficPool: q.PolarisTrafficPool.WithContext(ctx),
+		PolarisMonitorCenter: q.PolarisMonitorCenter.WithContext(ctx),
+		PolarisResourceAgent: q.PolarisResourceAgent.WithContext(ctx),
+		PolarisTaskRecord:    q.PolarisTaskRecord.WithContext(ctx),
+		PolarisTaskReplay:    q.PolarisTaskReplay.WithContext(ctx),
+		PolarisTrafficPool:   q.PolarisTrafficPool.WithContext(ctx),
 	}
 }
 

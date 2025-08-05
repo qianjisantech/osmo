@@ -264,6 +264,15 @@ type TaskRecordDetailRespData struct {
 	AgentName    string `json:"agent_name"`
 }
 
+type TaskRecordExecuteReq struct {
+	ID string `path:"id"`
+}
+
+type TaskRecordExecuteResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type TaskRecordQueryPageReq struct {
 	PageSize        int      `json:"page_size"`         //页最大数量
 	Page            int      `json:"page"`              //当前页
@@ -296,6 +305,7 @@ type TaskRecordQueryPageRespRecord struct {
 	AgentId      string `json:"agent_id"`
 	AgentName    string `json:"agent_name"`
 	ListenPort   string `json:"listen_port"`
+	ExecuteTime  string `json:"execute_time"`
 }
 
 type TaskRecordUpdateReq struct {

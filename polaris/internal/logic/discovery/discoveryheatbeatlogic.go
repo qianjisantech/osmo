@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"polaris/common/errorx"
 	"polaris/common/utils"
+	"polaris/constant"
 	"polaris/gen/model"
 	"polaris/gen/query"
 	"polaris/internal/svc"
 	"polaris/internal/types"
 	"strconv"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -44,7 +46,7 @@ func (l *DiscoveryHeatBeatLogic) DiscoveryHeatBeat(req *types.DiscoveryHeatBeatR
 	}
 
 	// 2. 准备数据模型
-	agent := &model.GosmoResourceAgent{
+	agent := &model.PolarisResourceAgent{
 		ID:                    id,
 		IP:                    req.IP,
 		Status:                req.Status,
@@ -62,11 +64,14 @@ func (l *DiscoveryHeatBeatLogic) DiscoveryHeatBeat(req *types.DiscoveryHeatBeatR
 	}
 
 	// 3. 使用事务处理数据库操作
-	var updatedAgent *model.GosmoResourceAgent
+	var (
+		updatedAgent *model.PolarisResourceAgent
+		tasks        []*model.PolarisTaskRecord
+	)
 	err = query.Q.Transaction(func(tx *query.Query) error {
 		// 更新操作
-		res, err := tx.GosmoResourceAgent.WithContext(l.ctx).Debug().
-			Where(tx.GosmoResourceAgent.ID.Eq(id)).
+		res, err := tx.PolarisResourceAgent.WithContext(l.ctx).Debug().
+			Where(tx.PolarisResourceAgent.ID.Eq(id)).
 			Updates(agent)
 		if err != nil {
 			return err
@@ -74,12 +79,25 @@ func (l *DiscoveryHeatBeatLogic) DiscoveryHeatBeat(req *types.DiscoveryHeatBeatR
 		logx.Infof("心跳处理完成: ID=%d,结果=%v", id, res.RowsAffected)
 
 		// 查询最新信息
-		updatedAgent, err = tx.GosmoResourceAgent.WithContext(l.ctx).
-			Where(tx.GosmoResourceAgent.ID.Eq(id)).
+		updatedAgent, err = tx.PolarisResourceAgent.WithContext(l.ctx).
+			Where(tx.PolarisResourceAgent.ID.Eq(id)).
 			First()
 		if err != nil {
 			return err
 		}
+
+		// 查询关联的录制任务
+		tasks, err = tx.PolarisTaskRecord.WithContext(l.ctx).
+			Where(
+				tx.PolarisTaskRecord.AgentID.Eq(strconv.FormatInt(id, 10)),
+				tx.PolarisTaskRecord.IsDeleted.Is(false),
+				tx.PolarisTaskRecord.Status.In(constant.TaskStatuses...),
+			).
+			Find()
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 
@@ -99,13 +117,44 @@ func (l *DiscoveryHeatBeatLogic) DiscoveryHeatBeat(req *types.DiscoveryHeatBeatR
 		name = *updatedAgent.Name
 	}
 
-	// 6. 返回响应
+	// 6. 转换任务数据
+	taskList := make([]types.DiscoveryHeatBeatRespDataTask, 0, len(tasks))
+	for _, task := range tasks {
+		listenPort, _ := strconv.Atoi(task.ListenPort)
+
+		taskList = append(taskList, types.DiscoveryHeatBeatRespDataTask{
+			Id:           strconv.FormatInt(task.ID, 10),
+			Name:         task.Name,
+			Status:       task.Status,
+			ListenPort:   listenPort,
+			CreateTime:   task.CreateTime.Format(time.DateTime),
+			CreateBy:     task.CreateBy,
+			CreateByName: task.CreateByName,
+			UpdateBy:     task.UpdateBy,
+			UpdateByName: task.UpdateByName,
+			UpdateTime:   task.UpdateTime.Format(time.DateTime),
+			StartTime:    formatNullableTime(task.StartTime),
+			EndTime:      formatNullableTime(task.EndTime),
+			ExecuteTime:  formatNullableTime(task.ExecuteTime),
+		})
+	}
+
+	// 7. 返回响应
 	return &types.DiscoveryHeatBeatResp{
 		Success: true,
 		Message: fmt.Sprintf("处理执行机心跳成功: ID=%d", id),
 		Data: types.DiscoveryHeatBeatRespData{
-			Id:   strconv.FormatInt(updatedAgent.ID, 10),
-			Name: name, // 使用处理后的非指针值
+			Id:    strconv.FormatInt(updatedAgent.ID, 10),
+			Name:  name,
+			Tasks: taskList,
 		},
 	}, nil
+}
+
+// 辅助函数：格式化可能为nil的时间字段
+func formatNullableTime(t *time.Time) string {
+	if t == nil {
+		return ""
+	}
+	return t.Format(time.DateTime)
 }

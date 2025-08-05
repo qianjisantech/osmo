@@ -11,7 +11,7 @@ Timer:
 Polaris:
   Discovery:
     Addr: 'http://127.0.0.1:8080'
-    HeartbeatInterval: 30
+    HeartbeatInterval: 5
     Timeout: 5
     Retry:
       MaxAttempts: 3

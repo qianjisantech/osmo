@@ -3,10 +3,23 @@ Host: 0.0.0.0
 Port: 8080
 
 Mysql:
-  Datasource: root:123456@tcp(localhost:3306)/osmo?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  #  Datasource: root:123456@tcp(localhost:3306)/osmo?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  Addr: localhost:3306
+  DbName: polaris
+  User: root
+  Password: '123456'
+  Charset: utf8mb4
+  MaxLifeTime: 60
+  MaxIdleTime: 60
+  ParseTime: true
   OpenDebugLog: true
+  loc: Asia/Shanghai
   MaxIdleConns: 10
   MaxOpenConns: 100
+  BinLogTables:
+    - Name: "polaris_task_record"
+      Fields: ["status"]
+
 
 Kafka:
   Brokers:
@@ -18,5 +31,4 @@ Kafka:
   Offset: "first"  # 从最早的消息开始消费
   Consumers: 4     # 消费者数量
   Processors: 4    # 处理器数量
-
 

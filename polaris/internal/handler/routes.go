@@ -45,7 +45,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/run/callback",
-				Handler: task.TaskRunCallBackHandler(serverCtx),
+				Handler: task.AgentRecordTaskRunCallBackHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sync",
+				Handler: task.AgentRecordTaskSyncHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/polaris/agent/task"),

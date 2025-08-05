@@ -15,23 +15,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
-				Path:    "/task/close",
-				Handler: agent.AgentTaskCloseHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/task/list",
-				Handler: agent.AgentTaskListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
 				Path:    "/task/start",
 				Handler: agent.AgentTaskStartHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/task/stop",
-				Handler: agent.AgentTaskStopHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/agent"),
