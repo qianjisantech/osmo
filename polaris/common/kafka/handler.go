@@ -66,6 +66,21 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 		return fmt.Errorf("解析消息失败: %v", err)
 	}
 	log.Printf("解析出来的信息: %v", message)
+
+	// 先查询任务记录获取任务名称
+	var taskRecord model.PolarisTaskRecord
+	taskID := string(msg.Key)
+	if err := svcCtx.DB.Where("id = ?", taskID).First(&taskRecord).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("警告: 未找到对应的任务记录, TaskID: %s", taskID)
+			// 可以设置默认任务名称或返回错误
+			taskRecord.Name = "未知任务"
+		} else {
+			log.Printf("查询任务记录失败: %v", err)
+			return fmt.Errorf("查询任务记录失败: %v", err)
+		}
+	}
+
 	// 先查询是否已存在该 APIID 的记录
 	var existingRecord model.PolarisTrafficPool
 	err = svcCtx.DB.Where(query.PolarisTrafficPool.APIID.Eq(message.ID)).First(&existingRecord).Error
@@ -82,6 +97,7 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 				Method:         message.Method,
 				CompletedFlag:  0,
 				TaskID:         string(msg.Key),
+				TaskName:       taskRecord.Name,
 			})
 			if tx.Error != nil {
 				return fmt.Errorf("创建请求记录失败: %v", tx.Error)
@@ -96,6 +112,7 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 				HTTPType:        &message.Method,
 				CompletedFlag:   0,
 				TaskID:          string(msg.Key),
+				TaskName:        taskRecord.Name,
 			})
 			if tx.Error != nil {
 				return fmt.Errorf("创建请求记录失败: %v", tx.Error)

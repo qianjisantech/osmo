@@ -30,6 +30,7 @@ type PolarisTrafficPool struct {
 	ResponseBody    *string    `gorm:"column:response_body" json:"response_body"`
 	ResponseHeaders *string    `gorm:"column:response_headers" json:"response_headers"`
 	TaskID          string     `gorm:"column:task_id;not null" json:"task_id"`
+	TaskName        string     `gorm:"column:task_name;not null" json:"task_name"`
 	APIID           string     `gorm:"column:api_id;not null" json:"api_id"`
 	HTTPType        *string    `gorm:"column:http_type" json:"http_type"`
 }

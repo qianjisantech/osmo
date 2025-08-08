@@ -177,7 +177,11 @@ func MapToPolarisTrafficPool(data map[string]interface{}) (*model.PolarisTraffic
 			trafficPool.Method = strings.ToUpper(methodStr)
 		}
 	}
-
+	if methodVal := getValue("task_name"); methodVal != nil {
+		if taskNameStr, ok := methodVal.(string); ok && taskNameStr != "" {
+			trafficPool.TaskName = strings.ToUpper(taskNameStr)
+		}
+	}
 	if taskIDVal := getValue("task_id"); taskIDVal != nil {
 		switch v := taskIDVal.(type) {
 		case string:

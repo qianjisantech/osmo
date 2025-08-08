@@ -45,6 +45,7 @@ func newPolarisTrafficPool(db *gorm.DB, opts ...gen.DOOption) polarisTrafficPool
 	_polarisTrafficPool.ResponseBody = field.NewString(tableName, "response_body")
 	_polarisTrafficPool.ResponseHeaders = field.NewString(tableName, "response_headers")
 	_polarisTrafficPool.TaskID = field.NewString(tableName, "task_id")
+	_polarisTrafficPool.TaskName = field.NewString(tableName, "task_name")
 	_polarisTrafficPool.APIID = field.NewString(tableName, "api_id")
 	_polarisTrafficPool.HTTPType = field.NewString(tableName, "http_type")
 	_polarisTrafficPool.CompletedFlag = field.NewInt32(tableName, "completed_flag")
@@ -76,6 +77,7 @@ type polarisTrafficPool struct {
 	ResponseBody    field.String
 	ResponseHeaders field.String
 	TaskID          field.String
+	TaskName        field.String
 	APIID           field.String
 	HTTPType        field.String
 	CompletedFlag   field.Int32 // 录制完整标识  0为否 1为是
@@ -113,6 +115,7 @@ func (p *polarisTrafficPool) updateTableName(table string) *polarisTrafficPool {
 	p.ResponseBody = field.NewString(table, "response_body")
 	p.ResponseHeaders = field.NewString(table, "response_headers")
 	p.TaskID = field.NewString(table, "task_id")
+	p.TaskName = field.NewString(table, "task_name")
 	p.APIID = field.NewString(table, "api_id")
 	p.HTTPType = field.NewString(table, "http_type")
 	p.CompletedFlag = field.NewInt32(table, "completed_flag")
@@ -144,7 +147,7 @@ func (p *polarisTrafficPool) GetFieldByName(fieldName string) (field.OrderExpr, 
 }
 
 func (p *polarisTrafficPool) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 21)
+	p.fieldMap = make(map[string]field.Expr, 22)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["is_deleted"] = p.IsDeleted
 	p.fieldMap["deleted_time"] = p.DeletedTime
@@ -163,6 +166,7 @@ func (p *polarisTrafficPool) fillFieldMap() {
 	p.fieldMap["response_body"] = p.ResponseBody
 	p.fieldMap["response_headers"] = p.ResponseHeaders
 	p.fieldMap["task_id"] = p.TaskID
+	p.fieldMap["task_name"] = p.TaskName
 	p.fieldMap["api_id"] = p.APIID
 	p.fieldMap["http_type"] = p.HTTPType
 	p.fieldMap["completed_flag"] = p.CompletedFlag

@@ -17,7 +17,8 @@ type SyncOsmoPolarisTrafficPool struct {
 	RequestHeaders  string `json:"request_headers"`
 	ResponseBody    string `json:"response_body"`
 	ResponseHeaders string `json:"response_headers"`
-	TaskID          string `json:"task_id"`
+	TaskId          string `json:"task_id"`
+	TaskName        string `json:"task_name"`
 	HTTPType        string `json:"http_type"`
 }
 
@@ -52,7 +53,8 @@ func PolarisTrafficPoolWatcher(columnName string, oldVal, newVal interface{}, ol
 		RequestHeaders:  *polarisTrafficPool.RequestHeaders,
 		ResponseBody:    *polarisTrafficPool.ResponseBody,
 		URL:             polarisTrafficPool.URL,
-		TaskID:          polarisTrafficPool.TaskID,
+		TaskId:          polarisTrafficPool.TaskID,
+		TaskName:        polarisTrafficPool.TaskName,
 		HTTPType:        *polarisTrafficPool.HTTPType,
 		Method:          polarisTrafficPool.Method,
 	}

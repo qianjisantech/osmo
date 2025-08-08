@@ -241,44 +241,44 @@ const closeDialog = () => {
         <ElFormItem label="任务名称" prop="name" class="form-item-full">
           <ElInput v-model="form.name" placeholder="请输入任务名称" clearable />
         </ElFormItem>
-        <ElFormItem label="监控中心" prop="agent" class="form-item">
-          <ElSelect
-            value-key="id"
-            v-model="form.agent"
-            @change="handleAgentChange"
-            remote
-            placeholder="请选择监控中心"
-            clearable
-            filterable
-            :loading="agentListLoading"
-            @focus="handleSelectFocus"
-            @visible-change="handleSelectFocus"
-            class="select-input"
-          >
-            <ElOption
-              v-for="item in agentSelectOptions"
-              :key="item.id"
-              :label="item.key"
-              :value="item"
-            >
-              <div class="option-content">
-                <div class="option-header">
-                  <span class="option-label">{{ item.key }}</span>
-                  <div class="option-meta">{{ item.value }}</div>
-                  <ElTag
-                    :type="
-                      item.execute_status === 'idle' ? 'success' : 'warning'
-                    "
-                    size="small"
-                    class="option-tag"
-                  >
-                    {{ item.execute_status === 'idle' ? '空闲' : '忙碌' }}
-                  </ElTag>
-                </div>
-              </div>
-            </ElOption>
-          </ElSelect>
-        </ElFormItem>
+<!--        <ElFormItem label="监控中心" prop="agent" class="form-item">-->
+<!--          <ElSelect-->
+<!--            value-key="id"-->
+<!--            v-model="form.agent"-->
+<!--            @change="handleAgentChange"-->
+<!--            remote-->
+<!--            placeholder="请选择监控中心"-->
+<!--            clearable-->
+<!--            filterable-->
+<!--            :loading="agentListLoading"-->
+<!--            @focus="handleSelectFocus"-->
+<!--            @visible-change="handleSelectFocus"-->
+<!--            class="select-input"-->
+<!--          >-->
+<!--            <ElOption-->
+<!--              v-for="item in agentSelectOptions"-->
+<!--              :key="item.id"-->
+<!--              :label="item.key"-->
+<!--              :value="item"-->
+<!--            >-->
+<!--              <div class="option-content">-->
+<!--                <div class="option-header">-->
+<!--                  <span class="option-label">{{ item.key }}</span>-->
+<!--                  <div class="option-meta">{{ item.value }}</div>-->
+<!--                  <ElTag-->
+<!--                    :type="-->
+<!--                      item.execute_status === 'idle' ? 'success' : 'warning'-->
+<!--                    "-->
+<!--                    size="small"-->
+<!--                    class="option-tag"-->
+<!--                  >-->
+<!--                    {{ item.execute_status === 'idle' ? '空闲' : '忙碌' }}-->
+<!--                  </ElTag>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </ElOption>-->
+<!--          </ElSelect>-->
+<!--        </ElFormItem>-->
         <ElFormItem label="执行机" prop="agent" class="form-item">
           <ElSelect
             value-key="id"

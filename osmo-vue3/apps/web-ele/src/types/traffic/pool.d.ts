@@ -21,6 +21,8 @@ export namespace TrafficPoolNamespace {
     method: string;
     http_type: string;
     record_time: string;
+    record_task_name: string;
+    record_task_id: string;
   }
 
   /**

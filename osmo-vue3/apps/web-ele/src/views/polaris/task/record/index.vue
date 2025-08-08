@@ -236,10 +236,9 @@ onMounted(() => {
                 placeholder="请选择任务策略"
                 clearable
               >
-                <ElOption label="全部" value="" />
-                <ElOption label="全量回放" value="full" />
-                <ElOption label="抽样回放" value="sample" />
-                <ElOption label="定时回放" value="scheduled" />
+                <ElOption label="全部" value="all" />
+                <ElOption label="实时录制" value="live" />
+                <ElOption label="定时录制" value="scheduled" />
               </ElSelect>
             </div>
             <div class="form-item">

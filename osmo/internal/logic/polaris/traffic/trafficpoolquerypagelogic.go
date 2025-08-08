@@ -118,6 +118,8 @@ func (l *TrafficPoolQueryPageLogic) TrafficPoolQueryPage(req *types.TrafficPoolQ
 			RequestHeaders:  requestHeaders,
 			HttpType:        httpType,
 			RecordTime:      poolRecord.CreateTime.Format(time.DateTime),
+			RecordTaskId:    poolRecord.TaskID,
+			RecordTaskName:  poolRecord.TaskName,
 		})
 	}
 

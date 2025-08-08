@@ -41,7 +41,7 @@ func (l *TaskRecordQueryPageLogic) TaskRecordQueryPage(req *types.TaskRecordQuer
 	}
 	// 添加录制策略筛选条件
 	if req.Strategy != "" {
-		queryBuilder = queryBuilder.Where(q.StrategyName.Eq(req.Strategy))
+		queryBuilder = queryBuilder.Where(q.StrategyCode.Eq(req.Strategy))
 	}
 	if req.Status != "" {
 		queryBuilder = queryBuilder.Where(q.Status.Eq(req.Status))

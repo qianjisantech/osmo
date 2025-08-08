@@ -73,6 +73,7 @@ func (l *EdiTrafficPoolSyncLogic) EdiTrafficPoolSync(req *types.EdiTrafficPoolSy
 		CreateByName:    "系统",     // 可根据实际情况修改
 		UpdateBy:        "system", // 可根据实际情况修改
 		UpdateByName:    "系统",     // 可根据实际情况修改
+		TaskName:        req.TaskName,
 	}
 
 	// 执行数据库插入操作

@@ -199,6 +199,7 @@ onMounted(() => {
           <ElTableColumn prop="id" label="序号" width="200" />
           <ElTableColumn prop="url" label="地址" width="700" />
           <ElTableColumn prop="method" label="请求方式" />
+          <ElTableColumn prop="record_task_name" label="录制任务名称" />
           <ElTableColumn prop="record_time" label="录制时间" />
           <ElTableColumn label="操作" width="180">
             <template #default="{ row }">

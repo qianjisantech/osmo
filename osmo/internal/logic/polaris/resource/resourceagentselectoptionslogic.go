@@ -57,7 +57,7 @@ func (l *ResourceAgentSelectOptionsLogic) ResourceAgentSelectOptions(req *types.
 	options := make([]types.ResourceAgentSelectOptionsRespData, 0, len(agents))
 	for _, agent := range agents {
 		options = append(options, types.ResourceAgentSelectOptionsRespData{
-			Key:           agent.HostName,
+			Key:           *agent.Name,
 			Value:         agent.IP,
 			Id:            strconv.FormatInt(agent.ID, 10),
 			ExecuteStatus: agent.ExecuteStatus,

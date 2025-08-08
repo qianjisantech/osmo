@@ -50,7 +50,9 @@ type (
         Method string `json:"method"`
         Url string `json:"url"`
         TaskId string  `json:"task_id"`
+        TaskName string  `json:"task_name"`
         HttpType string `json:"http_type"`
+
     }
     EdiTrafficPoolSyncResp {
         Success bool `json:"success"`

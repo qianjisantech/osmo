@@ -73,6 +73,7 @@ type EdiTrafficPoolSyncReq struct {
 	Method          string `json:"method"`
 	Url             string `json:"url"`
 	TaskId          string `json:"task_id"`
+	TaskName        string `json:"task_name"`
 	HttpType        string `json:"http_type"`
 }
 
@@ -410,6 +411,8 @@ type TrafficPoolQueryPageRespDataRecord struct {
 	Method          string `json:"method"`
 	HttpType        string `json:"http_type"`
 	RecordTime      string `json:"record_time"`
+	RecordTaskId    string `json:"record_task_id"`
+	RecordTaskName  string `json:"record_task_name"`
 }
 
 type UserInfoRequest struct {
