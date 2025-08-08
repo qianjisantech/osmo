@@ -6,7 +6,7 @@ sidebar: false
 hero:
   name: Osmo
   text: 一站式质量管理平台
-  tagline: 
+  tagline: 让质量保障变得更简单
   image:
     src: https://img0.baidu.com/it/u=3666118719,1618638927&fm=253&fmt=auto&app=138&f=PNG
     alt: Osmo
@@ -30,21 +30,21 @@ features:
     details: 基于Goreplay二次开发适用于K8s集群流量录制和回放的管理平台
     link: /guide/introduction/quick-start
     linkText: 快速开始
-#  - icon: 🦄
-#    title: 丰富的配置
-#    details: 企业级中后台前端解决方案，提供丰富的组件和模板以及 N 种偏好设置组合方案。
-#    link: /guide/essentials/settings
-#    linkText: 配置文档
-#  - icon: 🎨
-#    title: 主题定制
-#    details: 通过简单的配置，即可实现各种主题切换，满足个性化需求。
-#    link: /guide/in-depth/theme
-#    linkText: 主题文档
-#  - icon: 🌐
-#    title: 国际化
-#    details: 内置国际化方案，支持多语言切换，满足国际化需求。
-#    link: /guide/in-depth/locale
-#    linkText: 国际化文档
+  - icon: 🦄
+    title: 千机(Qianji)-AI云真机平台
+    details: 基于UI自动化大模型实现的云真机平台
+    link: /guide/essentials/settings
+    linkText: 快速开始
+  - icon: 🎨
+    title: EasyPost-私有化部署接口管理平台
+    details: 集成AI的企业级接口管理平台
+    link: /guide/in-depth/theme
+    linkText: 快速开始
+  - icon: 🌐
+    title: 沃坎(Volcan)-新一代Devops运维平台
+    details: 支持私有化部署，支持多环境管理，支持多集群管理
+    link: /guide/in-depth/locale
+    linkText: 快速开始
 #  - icon: 🔐
 #    title: 权限管理
 #    details: 内置权限管理方案，支持多种权限控制方式，满足各种权限需求。
