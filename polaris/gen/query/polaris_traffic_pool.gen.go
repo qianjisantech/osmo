@@ -47,6 +47,7 @@ func newPolarisTrafficPool(db *gorm.DB, opts ...gen.DOOption) polarisTrafficPool
 	_polarisTrafficPool.TaskID = field.NewString(tableName, "task_id")
 	_polarisTrafficPool.APIID = field.NewString(tableName, "api_id")
 	_polarisTrafficPool.HTTPType = field.NewString(tableName, "http_type")
+	_polarisTrafficPool.CompletedFlag = field.NewInt32(tableName, "completed_flag")
 
 	_polarisTrafficPool.fillFieldMap()
 
@@ -77,6 +78,7 @@ type polarisTrafficPool struct {
 	TaskID          field.String
 	APIID           field.String
 	HTTPType        field.String
+	CompletedFlag   field.Int32 // 录制完整标识  0为否 1为是
 
 	fieldMap map[string]field.Expr
 }
@@ -113,6 +115,7 @@ func (p *polarisTrafficPool) updateTableName(table string) *polarisTrafficPool {
 	p.TaskID = field.NewString(table, "task_id")
 	p.APIID = field.NewString(table, "api_id")
 	p.HTTPType = field.NewString(table, "http_type")
+	p.CompletedFlag = field.NewInt32(table, "completed_flag")
 
 	p.fillFieldMap()
 
@@ -141,7 +144,7 @@ func (p *polarisTrafficPool) GetFieldByName(fieldName string) (field.OrderExpr, 
 }
 
 func (p *polarisTrafficPool) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 20)
+	p.fieldMap = make(map[string]field.Expr, 21)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["is_deleted"] = p.IsDeleted
 	p.fieldMap["deleted_time"] = p.DeletedTime
@@ -162,6 +165,7 @@ func (p *polarisTrafficPool) fillFieldMap() {
 	p.fieldMap["task_id"] = p.TaskID
 	p.fieldMap["api_id"] = p.APIID
 	p.fieldMap["http_type"] = p.HTTPType
+	p.fieldMap["completed_flag"] = p.CompletedFlag
 }
 
 func (p polarisTrafficPool) clone(db *gorm.DB) polarisTrafficPool {

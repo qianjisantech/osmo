@@ -60,11 +60,14 @@ func (l *TaskRecordCreateLogic) TaskRecordCreate(req *types.TaskRecordCreateReq)
 	}
 
 	// 3. 处理 Description 空值
-	description := ""
+	var (
+		description string
+		executeTime time.Time
+	)
 	if req.Description != "" {
 		description = req.Description
 	}
-
+	executeTime = time.Now()
 	// 4. 创建录制任务记录
 	taskRecord := &model.PolarisTaskRecord{
 		Name:              req.Name,
@@ -77,6 +80,7 @@ func (l *TaskRecordCreateLogic) TaskRecordCreate(req *types.TaskRecordCreateReq)
 		MonitorCenterURL:  monitorCenterURL,
 		MonitorCenterID:   monitorCenterID,
 		MonitorCenterName: monitorCenterName,
+		ExecuteTime:       &executeTime,
 	}
 	if len(req.RecordTime) == 2 {
 		startTime, err := time.Parse(time.DateTime, req.RecordTime[0])

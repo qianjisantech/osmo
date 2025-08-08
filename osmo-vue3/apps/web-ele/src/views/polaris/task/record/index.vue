@@ -4,14 +4,10 @@ import type { TaskRecordNameSpace } from '#/types/task/record';
 import { computed, onMounted, reactive, ref } from 'vue';
 
 import {
-  Delete,
   Document,
-  Edit,
   Plus,
-  Promotion,
   Refresh,
   Search,
-  View,
 } from '@element-plus/icons-vue';
 import {
   ElButton,
@@ -31,7 +27,7 @@ import {
 } from 'element-plus';
 
 import { useTaskRecordStore } from '#/store/polaris/task/record';
-
+import dayjs from 'dayjs'; // 推荐使用dayjs处理日期
 import ExecuteConfirmDialog from './components/ExecuteConfirmDialog.vue';
 import TaskFormDialog from './components/TaskFormDialog.vue';
 
@@ -107,6 +103,8 @@ const getTaskStatusType = (status: string): TaskRecordNameSpace.ElTagType => {
 const handleAddTask = () => {
   showDialog.value = true;
 };
+const now = dayjs(); // 当前时间
+const endOfDay = dayjs().endOf('day'); // 当天23:59:59
 // 表单数据
 const form = reactive<TaskRecordNameSpace.TaskRecordCreateForm>({
   id: '',
@@ -115,7 +113,10 @@ const form = reactive<TaskRecordNameSpace.TaskRecordCreateForm>({
   agent: {},
   description: '',
   listen_port: '80', // 默认监听80端口
-  record_time: [], // 普通录制使用
+  record_time: [
+    now.format('YYYY-MM-DD HH:mm:ss'),
+    endOfDay.format('YYYY-MM-DD HH:mm:ss')
+  ],
 });
 const mockData = reactive({
   strategies: [
@@ -151,8 +152,13 @@ const handleSubmitTask = async (
     }
     await handleQueryPage();
     showDialog.value = false;
-  } catch (error) {
-    ElMessage.error(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      ElMessage.error(error.message);
+    } else {
+      ElMessage.error('发生未知错误');
+      console.error('非Error类型的错误:', error);
+    }
   }
 };
 // 修改 handleExecute 方法
@@ -167,8 +173,13 @@ const confirmExecute = async () => {
     // 这里添加实际执行任务的逻辑
     await taskRecordStore.executeFunc(confirmDialog.currentTask.id)
 
-  } catch (error) {
-    throw new Error(`执行失败: ${error.message}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      ElMessage.error(error.message);
+    } else {
+      ElMessage.error('发生未知错误');
+      console.error('非Error类型的错误:', error);
+    }
   } finally {
     confirmDialog.visible = false;
     confirmDialog.currentTask = null;

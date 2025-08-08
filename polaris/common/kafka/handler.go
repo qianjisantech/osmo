@@ -62,9 +62,10 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 
 	message, err := parseKafkaMessage(msg.Value)
 	if err != nil {
+		log.Printf("解析消息失败: %v", err)
 		return fmt.Errorf("解析消息失败: %v", err)
 	}
-
+	log.Printf("解析出来的信息: %v", message)
 	// 先查询是否已存在该 APIID 的记录
 	var existingRecord model.PolarisTrafficPool
 	err = svcCtx.DB.Where(query.PolarisTrafficPool.APIID.Eq(message.ID)).First(&existingRecord).Error
@@ -79,6 +80,8 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 				RequestBody:    &message.Body,
 				URL:            message.URL,
 				Method:         message.Method,
+				CompletedFlag:  0,
+				TaskID:         string(msg.Key),
 			})
 			if tx.Error != nil {
 				return fmt.Errorf("创建请求记录失败: %v", tx.Error)
@@ -91,6 +94,8 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 				ResponseHeaders: &headers,
 				ResponseBody:    &message.Body,
 				HTTPType:        &message.Method,
+				CompletedFlag:   0,
+				TaskID:          string(msg.Key),
 			})
 			if tx.Error != nil {
 				return fmt.Errorf("创建请求记录失败: %v", tx.Error)
@@ -106,6 +111,7 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 				"request_body":    message.Body,
 				"url":             message.URL,
 				"method":          message.Method,
+				"completed_flag":  1,
 			}
 
 			tx := svcCtx.DB.Model(&existingRecord).Updates(updateFields)
@@ -119,6 +125,7 @@ func processSingleMessage(svcCtx *svc.ServiceContext, msg kafka.Message) error {
 				"response_headers": responseHeaders,
 				"response_body":    message.Body,
 				"http_type":        message.Method,
+				"completed_flag":   1,
 			}
 
 			tx := svcCtx.DB.Model(&existingRecord).Updates(updateFields)

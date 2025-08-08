@@ -32,6 +32,7 @@ type PolarisTrafficPool struct {
 	TaskID          string     `gorm:"column:task_id;not null" json:"task_id"`
 	APIID           string     `gorm:"column:api_id;not null" json:"api_id"`
 	HTTPType        *string    `gorm:"column:http_type" json:"http_type"`
+	CompletedFlag   int32      `gorm:"column:completed_flag;not null;comment:录制完整标识  0为否 1为是" json:"completed_flag"` // 录制完整标识  0为否 1为是
 }
 
 // TableName PolarisTrafficPool's table name

@@ -21,16 +21,16 @@ func (m *PolarisTaskRecord) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 	// 确保必填字段有值
 	if m.CreateBy == "" {
-		m.CreateBy = "system"
+		m.CreateBy = "admin"
 	}
 	if m.CreateByName == "" {
-		m.CreateByName = "系统"
+		m.CreateByName = "超级管理员"
 	}
 	if m.UpdateBy == "" {
-		m.UpdateBy = "system"
+		m.UpdateBy = "admin"
 	}
 	if m.UpdateByName == "" {
-		m.UpdateByName = "系统"
+		m.UpdateByName = "超级管理员"
 	}
 	m.IsDeleted = false
 	return
@@ -39,10 +39,10 @@ func (m *PolarisTaskRecord) BeforeCreate(tx *gorm.DB) (err error) {
 func (m *PolarisTaskRecord) BeforeUpdate(tx *gorm.DB) (err error) {
 	// 确保更新人信息有值
 	if m.UpdateBy == "" {
-		m.UpdateBy = "system"
+		m.UpdateBy = "admin"
 	}
 	if m.UpdateByName == "" {
-		m.UpdateByName = "系统"
+		m.UpdateByName = "超级管理员"
 	}
 	return
 }

@@ -22,5 +22,11 @@ var TaskStatuses = []string{
 	string(TaskStatusPending),
 	string(TaskStatusRunning),
 	string(TaskStatusWaiting),
+	string(TaskStatusSuccess),
+	string(TaskStatusFailed),
+	string(TaskStatusCanceled),
+	string(TaskStatusTimeout),
+	string(TaskStatusSkipped),
+	string(TaskStatusAborted),
 	string(TaskStatusPaused),
 }

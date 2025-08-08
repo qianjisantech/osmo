@@ -187,6 +187,12 @@ github.com/qianjisantech/gosmo v0.0.2 h1:6KpmO9t4N0Al197V55UTn15FFdMvHFfTIN0XFlx
 github.com/qianjisantech/gosmo v0.0.2/go.mod h1:2piSqu+Fo2Y0xnaY+TfzUaSsiOcL5EAICBiQW5HOJ68=
 github.com/qianjisantech/gosmo v0.0.3 h1:Hf8v1HvfYjRJjF5jNJ14kHuRJoXeHTR6Cb1CIfu8ltY=
 github.com/qianjisantech/gosmo v0.0.3/go.mod h1:2piSqu+Fo2Y0xnaY+TfzUaSsiOcL5EAICBiQW5HOJ68=
+github.com/qianjisantech/gosmo v0.0.4 h1:LtWQZ69gJirNgZoQxaml+QCoSbPkRFSW2kh2Zd7pqkg=
+github.com/qianjisantech/gosmo v0.0.4/go.mod h1:2piSqu+Fo2Y0xnaY+TfzUaSsiOcL5EAICBiQW5HOJ68=
+github.com/qianjisantech/gosmo v0.0.5 h1:47bat2ZDiYuppb/swtLUt/g25HU7eYF0+34gnCZJ2Y8=
+github.com/qianjisantech/gosmo v0.0.5/go.mod h1:2piSqu+Fo2Y0xnaY+TfzUaSsiOcL5EAICBiQW5HOJ68=
+github.com/qianjisantech/gosmo v0.0.6 h1:FwC4gioq/xNf8YALi9mwtNWc81Hng6tVFoYz+zJwmbs=
+github.com/qianjisantech/gosmo v0.0.6/go.mod h1:2piSqu+Fo2Y0xnaY+TfzUaSsiOcL5EAICBiQW5HOJ68=
 github.com/qianjisantech/polaris-discovery-sdk v0.0.8 h1:BRgjMI0PsrD6DJNCcCoefTVyrbmKFgunwryfEGeouJs=
 github.com/qianjisantech/polaris-discovery-sdk v0.0.8/go.mod h1:ASSEnB5v6RZmAKD1CrED3rbphrcjyoWK5DwNJNaVCCI=
 github.com/qianjisantech/polaris-discovery-sdk v0.0.9 h1:Gzg58R4YcJ2SztzOLxzIjmVU/4sjtE1P3jxlV+T86co=

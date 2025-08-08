@@ -2,12 +2,14 @@ package traffic
 
 import (
 	"context"
+	"fmt"
 	"github.com/zeromicro/go-zero/core/logx"
 	"osmo/gen/query"
 	"osmo/internal/common/errorx"
 	"osmo/internal/svc"
 	"osmo/internal/types"
 	"strconv"
+	"time"
 )
 
 type TrafficPoolQueryPageLogic struct {
@@ -37,7 +39,28 @@ func (l *TrafficPoolQueryPageLogic) TrafficPoolQueryPage(req *types.TrafficPoolQ
 		queryBuilder = queryBuilder.Where(
 			q.URL.Like("%" + req.Keyword + "%"))
 	}
+	// 添加关键词搜索条件
+	if req.Method != "" {
+		queryBuilder = queryBuilder.Where(
+			q.Method.Eq(req.Method))
+	}
+	if len(req.RecordTimeRange) == 0 {
+		return nil, errorx.NewDefaultErrorf("筛选条件录制时间范围不能为空")
+	} else {
+		startTime, err := time.Parse(time.DateTime, req.RecordTimeRange[0])
+		if err != nil {
+			return nil, fmt.Errorf("解析开始时间失败: %v", err)
+		}
 
+		endTime, err := time.Parse(time.DateTime, req.RecordTimeRange[1])
+		if err != nil {
+			return nil, fmt.Errorf("解析结束时间失败: %v", err)
+		}
+
+		queryBuilder = queryBuilder.Where(
+			q.CreateTime.Gte(startTime),
+			q.CreateTime.Lte(endTime))
+	}
 	// 获取总数
 	total, err := queryBuilder.Count()
 	if err != nil {
@@ -94,6 +117,7 @@ func (l *TrafficPoolQueryPageLogic) TrafficPoolQueryPage(req *types.TrafficPoolQ
 			RequestBody:     requestBody,
 			RequestHeaders:  requestHeaders,
 			HttpType:        httpType,
+			RecordTime:      poolRecord.CreateTime.Format(time.DateTime),
 		})
 	}
 

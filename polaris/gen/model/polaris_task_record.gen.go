@@ -12,26 +12,29 @@ const TableNamePolarisTaskRecord = "polaris_task_record"
 
 // PolarisTaskRecord mapped from table <polaris_task_record>
 type PolarisTaskRecord struct {
-	ID            int64      `gorm:"column:id;primaryKey" json:"id"`
-	Name          string     `gorm:"column:name;not null" json:"name"`
-	Status        string     `gorm:"column:status;not null;comment:任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）" json:"status"` // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
-	IsDeleted     bool       `gorm:"column:is_deleted;not null;->;comment:逻辑删除标识（0 未删除；1 已删除）" json:"is_deleted"`                                                                                            // 逻辑删除标识（0 未删除；1 已删除）
-	DeletedTime   *time.Time `gorm:"column:deleted_time" json:"deleted_time"`
-	DeletedBy     *string    `gorm:"column:deleted_by" json:"deleted_by"`
-	DeletedByName *string    `gorm:"column:deleted_by_name" json:"deleted_by_name"`
-	CreateTime    time.Time  `gorm:"column:create_time;not null;default:CURRENT_TIMESTAMP;->" json:"create_time"`
-	CreateBy      string     `gorm:"column:create_by;not null" json:"create_by"`
-	CreateByName  string     `gorm:"column:create_by_name;not null" json:"create_by_name"`
-	UpdateTime    time.Time  `gorm:"column:update_time;not null;default:CURRENT_TIMESTAMP;->" json:"update_time"`
-	UpdateBy      string     `gorm:"column:update_by;not null" json:"update_by"`
-	UpdateByName  string     `gorm:"column:update_by_name;not null" json:"update_by_name"`
-	AgentID       string     `gorm:"column:agent_id;not null" json:"agent_id"`
-	AgentName     string     `gorm:"column:agent_name;not null" json:"agent_name"`
-	StartTime     *time.Time `gorm:"column:start_time" json:"start_time"`
-	EndTime       *time.Time `gorm:"column:end_time" json:"end_time"`
-	Description   *string    `gorm:"column:description;comment:描述" json:"description"` // 描述
-	ListenPort    string     `gorm:"column:listen_port;not null" json:"listen_port"`
-	ExecuteTime   *time.Time `gorm:"column:execute_time" json:"execute_time"`
+	ID               int64      `gorm:"column:id;primaryKey" json:"id"`
+	Name             string     `gorm:"column:name;not null" json:"name"`
+	Status           string     `gorm:"column:status;not null;comment:任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）" json:"status"` // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
+	IsDeleted        bool       `gorm:"column:is_deleted;not null;->;comment:逻辑删除标识（0 未删除；1 已删除）" json:"is_deleted"`                                                                                            // 逻辑删除标识（0 未删除；1 已删除）
+	DeletedTime      *time.Time `gorm:"column:deleted_time" json:"deleted_time"`
+	DeletedBy        *string    `gorm:"column:deleted_by" json:"deleted_by"`
+	DeletedByName    *string    `gorm:"column:deleted_by_name" json:"deleted_by_name"`
+	CreateTime       time.Time  `gorm:"column:create_time;not null;default:CURRENT_TIMESTAMP;->" json:"create_time"`
+	CreateBy         string     `gorm:"column:create_by;not null" json:"create_by"`
+	CreateByName     string     `gorm:"column:create_by_name;not null" json:"create_by_name"`
+	UpdateTime       time.Time  `gorm:"column:update_time;not null;default:CURRENT_TIMESTAMP;->" json:"update_time"`
+	UpdateBy         string     `gorm:"column:update_by;not null" json:"update_by"`
+	UpdateByName     string     `gorm:"column:update_by_name;not null" json:"update_by_name"`
+	AgentID          string     `gorm:"column:agent_id;not null" json:"agent_id"`
+	StartTime        *time.Time `gorm:"column:start_time" json:"start_time"`
+	EndTime          *time.Time `gorm:"column:end_time" json:"end_time"`
+	Description      *string    `gorm:"column:description;comment:描述" json:"description"` // 描述
+	ListenPort       string     `gorm:"column:listen_port;not null" json:"listen_port"`
+	ExecuteTime      *time.Time `gorm:"column:execute_time" json:"execute_time"`
+	FailReason       *string    `gorm:"column:fail_reason" json:"fail_reason"`
+	TotalRecordAPI   int32      `gorm:"column:total_record_api;not null" json:"total_record_api"`
+	SuccessRecordAPI *int32     `gorm:"column:success_record_api" json:"success_record_api"`
+	FailRecordAPI    *int32     `gorm:"column:fail_record_api" json:"fail_record_api"`
 }
 
 // TableName PolarisTaskRecord's table name

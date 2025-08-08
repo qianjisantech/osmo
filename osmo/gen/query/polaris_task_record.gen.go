@@ -54,6 +54,10 @@ func newPolarisTaskRecord(db *gorm.DB, opts ...gen.DOOption) polarisTaskRecord {
 	_polarisTaskRecord.MonitorCenterID = field.NewString(tableName, "monitor_center_id")
 	_polarisTaskRecord.MonitorCenterName = field.NewString(tableName, "monitor_center_name")
 	_polarisTaskRecord.MonitorCenterURL = field.NewString(tableName, "monitor_center_url")
+	_polarisTaskRecord.FailReason = field.NewString(tableName, "fail_reason")
+	_polarisTaskRecord.TotalRecordAPI = field.NewInt32(tableName, "total_record_api")
+	_polarisTaskRecord.SuccessRecordAPI = field.NewInt32(tableName, "success_record_api")
+	_polarisTaskRecord.FailRecordAPI = field.NewInt32(tableName, "fail_record_api")
 
 	_polarisTaskRecord.fillFieldMap()
 
@@ -91,6 +95,10 @@ type polarisTaskRecord struct {
 	MonitorCenterID   field.String
 	MonitorCenterName field.String
 	MonitorCenterURL  field.String
+	FailReason        field.String
+	TotalRecordAPI    field.Int32
+	SuccessRecordAPI  field.Int32
+	FailRecordAPI     field.Int32
 
 	fieldMap map[string]field.Expr
 }
@@ -134,6 +142,10 @@ func (p *polarisTaskRecord) updateTableName(table string) *polarisTaskRecord {
 	p.MonitorCenterID = field.NewString(table, "monitor_center_id")
 	p.MonitorCenterName = field.NewString(table, "monitor_center_name")
 	p.MonitorCenterURL = field.NewString(table, "monitor_center_url")
+	p.FailReason = field.NewString(table, "fail_reason")
+	p.TotalRecordAPI = field.NewInt32(table, "total_record_api")
+	p.SuccessRecordAPI = field.NewInt32(table, "success_record_api")
+	p.FailRecordAPI = field.NewInt32(table, "fail_record_api")
 
 	p.fillFieldMap()
 
@@ -162,7 +174,7 @@ func (p *polarisTaskRecord) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (p *polarisTaskRecord) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 27)
+	p.fieldMap = make(map[string]field.Expr, 31)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["status"] = p.Status
@@ -190,6 +202,10 @@ func (p *polarisTaskRecord) fillFieldMap() {
 	p.fieldMap["monitor_center_id"] = p.MonitorCenterID
 	p.fieldMap["monitor_center_name"] = p.MonitorCenterName
 	p.fieldMap["monitor_center_url"] = p.MonitorCenterURL
+	p.fieldMap["fail_reason"] = p.FailReason
+	p.fieldMap["total_record_api"] = p.TotalRecordAPI
+	p.fieldMap["success_record_api"] = p.SuccessRecordAPI
+	p.fieldMap["fail_record_api"] = p.FailRecordAPI
 }
 
 func (p polarisTaskRecord) clone(db *gorm.DB) polarisTaskRecord {

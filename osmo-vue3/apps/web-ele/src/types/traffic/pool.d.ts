@@ -6,6 +6,8 @@ export namespace TrafficPoolNamespace {
   export interface TrafficPoolQueryPageParams
     extends GlobalNamespace.QueryPageParams {
     keyword: string;
+    method?: string | undefined;
+    record_time_range: string[];
   }
 
   /** 执行机监控分页查询返回值Agent */
@@ -18,6 +20,7 @@ export namespace TrafficPoolNamespace {
     response_headers: string;
     method: string;
     http_type: string;
+    record_time: string;
   }
 
   /**

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"osmo/constant"
 	"osmo/util"
 	"strconv"
 	"time"
@@ -29,7 +30,7 @@ type SyncPolarisTaskRecord struct {
 }
 
 var (
-	syncUrl = "/polaris/agent/task/sync"
+	syncUrl = "/polaris/edi/task/record/sync"
 )
 
 func PolarisTaskRecordWatcher(columnName string, oldVal, newVal interface{}, fullRow map[string]interface{}) error {
@@ -50,33 +51,36 @@ func PolarisTaskRecordWatcher(columnName string, oldVal, newVal interface{}, ful
 	if polarisTaskRecord.MonitorCenterURL == "" {
 		return fmt.Errorf("监控中心地址为空")
 	}
-
-	client := util.NewHttpClient(6 * time.Second)
-	syncPolarisTaskRecord := &SyncPolarisTaskRecord{
-		ID:           strconv.FormatInt(polarisTaskRecord.ID, 10),
-		Name:         polarisTaskRecord.Name,
-		AgentID:      polarisTaskRecord.AgentID,
-		AgentName:    polarisTaskRecord.AgentName,
-		CreateBy:     polarisTaskRecord.CreateBy,
-		CreateByName: polarisTaskRecord.CreateByName,
-		CreateTime:   polarisTaskRecord.CreateTime.Format(time.DateTime),
-		UpdateBy:     polarisTaskRecord.UpdateBy,
-		UpdateByName: polarisTaskRecord.UpdateByName,
-		StartTime:    polarisTaskRecord.StartTime.Format(time.DateTime),
-		EndTime:      polarisTaskRecord.EndTime.Format(time.DateTime),
-		Status:       polarisTaskRecord.Status,
-		ListenPort:   polarisTaskRecord.ListenPort,
-		ExecuteTime:  polarisTaskRecord.ExecuteTime.Format(time.DateTime),
+	if polarisTaskRecord.Status == string(constant.TaskStatusPending) { //当任务为待定时 不同步给监控中心
+		return nil
+	} else {
+		client := util.NewHttpClient(6 * time.Second)
+		syncPolarisTaskRecord := &SyncPolarisTaskRecord{
+			ID:           strconv.FormatInt(polarisTaskRecord.ID, 10),
+			Name:         polarisTaskRecord.Name,
+			AgentID:      polarisTaskRecord.AgentID,
+			AgentName:    polarisTaskRecord.AgentName,
+			CreateBy:     polarisTaskRecord.CreateBy,
+			CreateByName: polarisTaskRecord.CreateByName,
+			CreateTime:   polarisTaskRecord.CreateTime.Format(time.DateTime),
+			UpdateBy:     polarisTaskRecord.UpdateBy,
+			UpdateByName: polarisTaskRecord.UpdateByName,
+			StartTime:    polarisTaskRecord.StartTime.Format(time.DateTime),
+			EndTime:      polarisTaskRecord.EndTime.Format(time.DateTime),
+			Status:       polarisTaskRecord.Status,
+			ListenPort:   polarisTaskRecord.ListenPort,
+			ExecuteTime:  polarisTaskRecord.ExecuteTime.Format(time.DateTime),
+		}
+		res, err := client.PostJSON(
+			context.Background(),
+			polarisTaskRecord.MonitorCenterURL+syncUrl,
+			syncPolarisTaskRecord,
+		)
+		if err != nil {
+			return fmt.Errorf("同步数据出错: %v", err)
+		}
+		log.Printf("同步任务结果：%s", res)
 	}
-	res, err := client.PostJSON(
-		context.Background(),
-		polarisTaskRecord.MonitorCenterURL+syncUrl,
-		syncPolarisTaskRecord,
-	)
-	if err != nil {
-		return fmt.Errorf("同步数据出错: %v", err)
-	}
-	log.Printf("同步任务结果：%s", res)
 
 	return nil
 }

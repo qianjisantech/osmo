@@ -145,30 +145,3 @@ func MapToPolarisTaskRecord(data map[string]interface{}) (*model.PolarisTaskReco
 
 	return record, nil
 }
-func parseTimeFromMap(timeStr interface{}) *time.Time {
-	if timeStr == nil {
-		return nil
-	}
-
-	str, ok := timeStr.(string)
-	if !ok || str == "" {
-		return nil
-	}
-
-	// 尝试常见的时间格式
-	formats := []string{
-		time.RFC3339,
-		"2006-01-02 15:04:05",
-		"2006-01-02T15:04:05",
-		time.DateTime,
-		time.DateOnly,
-	}
-
-	for _, format := range formats {
-		if t, err := time.Parse(format, str); err == nil {
-			return &t
-		}
-	}
-
-	return nil
-}

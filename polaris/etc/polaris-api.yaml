@@ -2,9 +2,11 @@ Name: polaris-api
 Host: 0.0.0.0
 Port: 8080
 
+Osmo:
+  Addr: http://localhost:8888
 Mysql:
   #  Datasource: root:123456@tcp(localhost:3306)/osmo?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
-  Addr: localhost:3306
+  Addr:  localhost:3306
   DbName: polaris
   User: root
   Password: '123456'
@@ -19,7 +21,8 @@ Mysql:
   BinLogTables:
     - Name: "polaris_task_record"
       Fields: ["status"]
-
+    - Name: "polaris_traffic_pool"
+      Fields: ["completed_flag"]
 
 Kafka:
   Brokers:

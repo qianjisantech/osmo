@@ -33,4 +33,7 @@ type Config struct {
 		Consumers  int
 		Processors int
 	}
+	Osmo struct {
+		Addr string
+	}
 }

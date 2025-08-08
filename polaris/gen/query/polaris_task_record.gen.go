@@ -41,12 +41,15 @@ func newPolarisTaskRecord(db *gorm.DB, opts ...gen.DOOption) polarisTaskRecord {
 	_polarisTaskRecord.UpdateBy = field.NewString(tableName, "update_by")
 	_polarisTaskRecord.UpdateByName = field.NewString(tableName, "update_by_name")
 	_polarisTaskRecord.AgentID = field.NewString(tableName, "agent_id")
-	_polarisTaskRecord.AgentName = field.NewString(tableName, "agent_name")
 	_polarisTaskRecord.StartTime = field.NewTime(tableName, "start_time")
 	_polarisTaskRecord.EndTime = field.NewTime(tableName, "end_time")
 	_polarisTaskRecord.Description = field.NewString(tableName, "description")
 	_polarisTaskRecord.ListenPort = field.NewString(tableName, "listen_port")
 	_polarisTaskRecord.ExecuteTime = field.NewTime(tableName, "execute_time")
+	_polarisTaskRecord.FailReason = field.NewString(tableName, "fail_reason")
+	_polarisTaskRecord.TotalRecordAPI = field.NewInt32(tableName, "total_record_api")
+	_polarisTaskRecord.SuccessRecordAPI = field.NewInt32(tableName, "success_record_api")
+	_polarisTaskRecord.FailRecordAPI = field.NewInt32(tableName, "fail_record_api")
 
 	_polarisTaskRecord.fillFieldMap()
 
@@ -56,27 +59,30 @@ func newPolarisTaskRecord(db *gorm.DB, opts ...gen.DOOption) polarisTaskRecord {
 type polarisTaskRecord struct {
 	polarisTaskRecordDo polarisTaskRecordDo
 
-	ALL           field.Asterisk
-	ID            field.Int64
-	Name          field.String
-	Status        field.String // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
-	IsDeleted     field.Bool   // 逻辑删除标识（0 未删除；1 已删除）
-	DeletedTime   field.Time
-	DeletedBy     field.String
-	DeletedByName field.String
-	CreateTime    field.Time
-	CreateBy      field.String
-	CreateByName  field.String
-	UpdateTime    field.Time
-	UpdateBy      field.String
-	UpdateByName  field.String
-	AgentID       field.String
-	AgentName     field.String
-	StartTime     field.Time
-	EndTime       field.Time
-	Description   field.String // 描述
-	ListenPort    field.String
-	ExecuteTime   field.Time
+	ALL              field.Asterisk
+	ID               field.Int64
+	Name             field.String
+	Status           field.String // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
+	IsDeleted        field.Bool   // 逻辑删除标识（0 未删除；1 已删除）
+	DeletedTime      field.Time
+	DeletedBy        field.String
+	DeletedByName    field.String
+	CreateTime       field.Time
+	CreateBy         field.String
+	CreateByName     field.String
+	UpdateTime       field.Time
+	UpdateBy         field.String
+	UpdateByName     field.String
+	AgentID          field.String
+	StartTime        field.Time
+	EndTime          field.Time
+	Description      field.String // 描述
+	ListenPort       field.String
+	ExecuteTime      field.Time
+	FailReason       field.String
+	TotalRecordAPI   field.Int32
+	SuccessRecordAPI field.Int32
+	FailRecordAPI    field.Int32
 
 	fieldMap map[string]field.Expr
 }
@@ -107,12 +113,15 @@ func (p *polarisTaskRecord) updateTableName(table string) *polarisTaskRecord {
 	p.UpdateBy = field.NewString(table, "update_by")
 	p.UpdateByName = field.NewString(table, "update_by_name")
 	p.AgentID = field.NewString(table, "agent_id")
-	p.AgentName = field.NewString(table, "agent_name")
 	p.StartTime = field.NewTime(table, "start_time")
 	p.EndTime = field.NewTime(table, "end_time")
 	p.Description = field.NewString(table, "description")
 	p.ListenPort = field.NewString(table, "listen_port")
 	p.ExecuteTime = field.NewTime(table, "execute_time")
+	p.FailReason = field.NewString(table, "fail_reason")
+	p.TotalRecordAPI = field.NewInt32(table, "total_record_api")
+	p.SuccessRecordAPI = field.NewInt32(table, "success_record_api")
+	p.FailRecordAPI = field.NewInt32(table, "fail_record_api")
 
 	p.fillFieldMap()
 
@@ -141,7 +150,7 @@ func (p *polarisTaskRecord) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (p *polarisTaskRecord) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 20)
+	p.fieldMap = make(map[string]field.Expr, 23)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["status"] = p.Status
@@ -156,12 +165,15 @@ func (p *polarisTaskRecord) fillFieldMap() {
 	p.fieldMap["update_by"] = p.UpdateBy
 	p.fieldMap["update_by_name"] = p.UpdateByName
 	p.fieldMap["agent_id"] = p.AgentID
-	p.fieldMap["agent_name"] = p.AgentName
 	p.fieldMap["start_time"] = p.StartTime
 	p.fieldMap["end_time"] = p.EndTime
 	p.fieldMap["description"] = p.Description
 	p.fieldMap["listen_port"] = p.ListenPort
 	p.fieldMap["execute_time"] = p.ExecuteTime
+	p.fieldMap["fail_reason"] = p.FailReason
+	p.fieldMap["total_record_api"] = p.TotalRecordAPI
+	p.fieldMap["success_record_api"] = p.SuccessRecordAPI
+	p.fieldMap["fail_record_api"] = p.FailRecordAPI
 }
 
 func (p polarisTaskRecord) clone(db *gorm.DB) polarisTaskRecord {

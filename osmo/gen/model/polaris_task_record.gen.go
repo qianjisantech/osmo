@@ -39,6 +39,10 @@ type PolarisTaskRecord struct {
 	MonitorCenterID   string     `gorm:"column:monitor_center_id;not null" json:"monitor_center_id"`
 	MonitorCenterName string     `gorm:"column:monitor_center_name;not null" json:"monitor_center_name"`
 	MonitorCenterURL  string     `gorm:"column:monitor_center_url;not null" json:"monitor_center_url"`
+	FailReason        *string    `gorm:"column:fail_reason" json:"fail_reason"`
+	TotalRecordAPI    *int32     `gorm:"column:total_record_api" json:"total_record_api"`
+	SuccessRecordAPI  *int32     `gorm:"column:success_record_api" json:"success_record_api"`
+	FailRecordAPI     *int32     `gorm:"column:fail_record_api" json:"fail_record_api"`
 }
 
 // TableName PolarisTaskRecord's table name

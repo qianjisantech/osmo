@@ -6,9 +6,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/qianjisantech/gosmo-agent/common/errorx"
+	"github.com/qianjisantech/gosmo-agent/internal/common/errorx"
 	"github.com/qianjisantech/gosmo-agent/internal/config"
-	"github.com/qianjisantech/gosmo-agent/internal/handler"
 	"github.com/qianjisantech/gosmo-agent/internal/svc"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -32,8 +31,7 @@ func main() {
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 
-	ctx := svc.NewServiceContext(c)
-	handler.RegisterHandlers(server, ctx)
+	svc.NewServiceContext(c)
 	httpx.SetErrorHandler(func(err error) (int, interface{}) {
 		var e *errorx.CodeError
 		switch {

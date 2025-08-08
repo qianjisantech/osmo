@@ -6,7 +6,8 @@ import (
 
 	config "polaris/internal/handler/config"
 	discovery "polaris/internal/handler/discovery"
-	task "polaris/internal/handler/task"
+	edi "polaris/internal/handler/edi"
+	inner "polaris/internal/handler/inner"
 	"polaris/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -44,15 +45,43 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
-				Path:    "/run/callback",
-				Handler: task.AgentRecordTaskRunCallBackHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/sync",
-				Handler: task.AgentRecordTaskSyncHandler(serverCtx),
+				Path:    "/record/sync",
+				Handler: edi.EdiRecordTaskSyncHandler(serverCtx),
 			},
 		},
-		rest.WithPrefix("/polaris/agent/task"),
+		rest.WithPrefix("/polaris/edi/task"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/info/sync",
+				Handler: edi.EdiAgentInfoSyncHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/polaris/edi/agent"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/record/sync",
+				Handler: inner.InnerRecordTaskSyncHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/polaris/inner/task"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/info/sync",
+				Handler: inner.InnerAgentInfoSyncHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/polaris/inner/agent"),
 	)
 }

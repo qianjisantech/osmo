@@ -29,6 +29,58 @@ type AuthLogoutResp struct {
 	Message string `json:"message"`
 }
 
+type EdiResourceAgentSyncReq struct {
+	Id                    string  `json:"id"`
+	IP                    string  `json:"ip"`
+	Hostname              string  `json:"hostname"`
+	CPUCores              int     `json:"cpu_cores"`
+	CPUUsedPercent        float64 `json:"cpu_used_percent"`
+	CPUFreePercent        float64 `json:"cpu_free_percent"`
+	MemoryTotal           uint64  `json:"memory_total"`
+	MemoryUsed            uint64  `json:"memory_used"`
+	MemoryFree            uint64  `json:"memory_free"`
+	MemoryUsedPercent     float64 `json:"memory_used_percent"`
+	NetworkBytesSent      uint64  `json:"network_bytes_sent"`
+	NetworkBytesReceive   uint64  `json:"network_bytes_receive"`
+	NetworkPacketsSent    uint64  `json:"network_packets_sent"`
+	NetworkPacketsReceive uint64  `json:"network_packets_receive"`
+	Status                string  `json:"status"`
+}
+
+type EdiResourceAgentSyncResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type EdiTaskRecordyncReq struct {
+	Id          string `json:"id"`
+	Status      string `json:"status"`
+	FailReason  string `json:"fail_reason,optional"`
+	ExecuteTime string `json:"execute_time,optional"`
+}
+
+type EdiTaskRecordyncResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type EdiTrafficPoolSyncReq struct {
+	Id              string `json:"id"`
+	ResponseHeaders string `json:"response_headers"`
+	ResponseBody    string `json:"response_body"`
+	RequestHeaders  string `json:"request_headers"`
+	RequestBody     string `json:"request_body"`
+	Method          string `json:"method"`
+	Url             string `json:"url"`
+	TaskId          string `json:"task_id"`
+	HttpType        string `json:"http_type"`
+}
+
+type EdiTrafficPoolSyncResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type ResourceAgentConsoleReq struct {
 	ID string `path:"id`
 }
@@ -330,9 +382,11 @@ type TrafficPoolDetailResp struct {
 }
 
 type TrafficPoolQueryPageReq struct {
-	PageSize int    `json:"page_size"` //页最大数量
-	Page     int    `json:"page"`      //当前页
-	Keyword  string `json:"keyword"`   // 关键字
+	PageSize        int      `json:"page_size"`         //页最大数量
+	Page            int      `json:"page"`              //当前页
+	Keyword         string   `json:"keyword"`           // 关键字
+	Method          string   `json:"method,optional"`   //请求方式
+	RecordTimeRange []string `json:"record_time_range"` //录制时间
 }
 
 type TrafficPoolQueryPageResp struct {
@@ -355,6 +409,7 @@ type TrafficPoolQueryPageRespDataRecord struct {
 	ResponseHeaders string `json:"response_headers"`
 	Method          string `json:"method"`
 	HttpType        string `json:"http_type"`
+	RecordTime      string `json:"record_time"`
 }
 
 type UserInfoRequest struct {

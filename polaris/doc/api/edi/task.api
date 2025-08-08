@@ -1,0 +1,41 @@
+syntax = "v1"
+
+info(
+    title: "discovery模块"
+    desc: "discovery模块接口定义"
+    author: "philip.shen"
+    email: "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+
+type (
+    EdiRecordTaskSyncReq {
+        Id string `json:"id"`
+        Name string `json:"name"`
+        Status string `json:"status"`
+        StartTime string `json:"start_time"`
+        EndTime string `json:"end_time"`
+        AgentId string `json:"agent_id"`
+        CreateBy string `json:"create_by"`
+        CreateByName string `json:"create_by_name"`
+        UpdateBy string `json:"update_by"`
+        UpdateByName string `json:"update_by_name"`
+        UpdateTime string `json:"update_time"`
+        CreateTime string `json:"create_time"`
+        ListenPort string`json:"listen_port"`
+        ExecuteTime string `json:"execute_time"`
+    }
+    EdiRecordTaskSyncResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+)
+
+@server(
+    group: edi
+    prefix: /polaris/edi/task
+)
+service polaris-api {
+    @handler EdiRecordTaskSync
+    post /record/sync (EdiRecordTaskSyncReq) returns (EdiRecordTaskSyncResp)
+}

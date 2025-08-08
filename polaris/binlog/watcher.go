@@ -14,6 +14,7 @@ type BinLogConfig struct {
 	Password string              `json:"password"` // MySQL密码
 	Database string              `json:"database"` // 要监听的数据库
 	Tables   []BinLogTableConfig `json:"tables"`   // 要监听的表配置
+	OsmoAddr string              `json:"osmo_addr"`
 }
 
 // BinLogTableConfig 表配置
@@ -23,7 +24,7 @@ type BinLogTableConfig struct {
 }
 
 // FieldChangeHandler 字段变更处理函数
-type FieldChangeHandler func(dbName, tableName, columnName string, oldVal, newVal interface{}, fullRow map[string]interface{})
+type FieldChangeHandler func(dbName, tableName, columnName string, oldVal, newVal interface{}, oldFullRow, newFullRow map[string]interface{})
 
 // BinlogWatcher Binlog监听器
 type BinlogWatcher struct {
@@ -121,21 +122,39 @@ func (h *binlogHandler) OnRow(e *canal.RowsEvent) error {
 		return nil
 	}
 
-	// 处理不同操作类型
-	switch e.Action {
-	case canal.UpdateAction:
-		return h.handleUpdate(e, tableConfig)
-	case canal.InsertAction:
-		return h.handleInsert(e, tableConfig)
-	case canal.DeleteAction:
-		return h.handleDelete(e, tableConfig)
+	// 根据表名决定处理策略
+	switch e.Table.Name {
+	case "polaris_task_record":
+		// 处理所有操作类型
+		switch e.Action {
+		case canal.UpdateAction:
+			return h.handleUpdate(e, tableConfig)
+		case canal.InsertAction:
+			return h.handleInsert(e, tableConfig)
+		case canal.DeleteAction:
+			return h.handleDelete(e, tableConfig)
+		}
+	case "polaris_traffic_pool":
+		// 只处理更新操作
+		if e.Action == canal.UpdateAction {
+			return h.handleUpdate(e, tableConfig)
+		}
+	default:
+		// 默认处理所有操作
+		switch e.Action {
+		case canal.UpdateAction:
+			return h.handleUpdate(e, tableConfig)
+		case canal.InsertAction:
+			return h.handleInsert(e, tableConfig)
+		case canal.DeleteAction:
+			return h.handleDelete(e, tableConfig)
+		}
 	}
 
 	return nil
 }
 
 // handleUpdate 处理更新事件
-// 修改handleUpdate方法
 func (h *binlogHandler) handleUpdate(e *canal.RowsEvent, tableConfig *BinLogTableConfig) error {
 	if len(e.Rows)%2 != 0 {
 		return fmt.Errorf("invalid rows data for update event in table %s", e.Table.Name)
@@ -152,16 +171,18 @@ func (h *binlogHandler) handleUpdate(e *canal.RowsEvent, tableConfig *BinLogTabl
 		newRow := e.Rows[i+1]
 
 		// 构建完整行数据
-		fullRow := make(map[string]interface{})
+		oldFullRow := make(map[string]interface{})
+		newFullRow := make(map[string]interface{})
 		for colName, idx := range columnIndexes {
-			fullRow[colName] = newRow[idx]
+			oldFullRow[colName] = oldRow[idx]
+			newFullRow[colName] = newRow[idx]
 		}
 
 		// 检查所有配置的字段
 		for _, column := range tableConfig.Fields {
 			if idx, ok := columnIndexes[column]; ok {
 				if oldRow[idx] != newRow[idx] {
-					h.notifyHandlers(e.Table.Schema, e.Table.Name, column, oldRow[idx], newRow[idx], fullRow)
+					h.notifyHandlers(e.Table.Schema, e.Table.Name, column, oldRow[idx], newRow[idx], oldFullRow, newFullRow)
 				}
 			}
 		}
@@ -170,7 +191,7 @@ func (h *binlogHandler) handleUpdate(e *canal.RowsEvent, tableConfig *BinLogTabl
 	return nil
 }
 
-// 修改handleInsert方法
+// handleInsert 处理插入事件
 func (h *binlogHandler) handleInsert(e *canal.RowsEvent, tableConfig *BinLogTableConfig) error {
 	columnIndexes := make(map[string]int)
 	for i, col := range e.Table.Columns {
@@ -179,14 +200,14 @@ func (h *binlogHandler) handleInsert(e *canal.RowsEvent, tableConfig *BinLogTabl
 
 	for _, row := range e.Rows {
 		// 构建完整行数据
-		fullRow := make(map[string]interface{})
+		newFullRow := make(map[string]interface{})
 		for colName, idx := range columnIndexes {
-			fullRow[colName] = row[idx]
+			newFullRow[colName] = row[idx]
 		}
 
 		for _, column := range tableConfig.Fields {
 			if idx, ok := columnIndexes[column]; ok {
-				h.notifyHandlers(e.Table.Schema, e.Table.Name, column, nil, row[idx], fullRow)
+				h.notifyHandlers(e.Table.Schema, e.Table.Name, column, nil, row[idx], nil, newFullRow)
 			}
 		}
 	}
@@ -194,7 +215,7 @@ func (h *binlogHandler) handleInsert(e *canal.RowsEvent, tableConfig *BinLogTabl
 	return nil
 }
 
-// 修改handleDelete方法
+// handleDelete 处理删除事件
 func (h *binlogHandler) handleDelete(e *canal.RowsEvent, tableConfig *BinLogTableConfig) error {
 	columnIndexes := make(map[string]int)
 	for i, col := range e.Table.Columns {
@@ -203,14 +224,14 @@ func (h *binlogHandler) handleDelete(e *canal.RowsEvent, tableConfig *BinLogTabl
 
 	for _, row := range e.Rows {
 		// 构建完整行数据
-		fullRow := make(map[string]interface{})
+		oldFullRow := make(map[string]interface{})
 		for colName, idx := range columnIndexes {
-			fullRow[colName] = row[idx]
+			oldFullRow[colName] = row[idx]
 		}
 
 		for _, column := range tableConfig.Fields {
 			if idx, ok := columnIndexes[column]; ok {
-				h.notifyHandlers(e.Table.Schema, e.Table.Name, column, row[idx], nil, fullRow)
+				h.notifyHandlers(e.Table.Schema, e.Table.Name, column, row[idx], nil, oldFullRow, nil)
 			}
 		}
 	}
@@ -219,9 +240,9 @@ func (h *binlogHandler) handleDelete(e *canal.RowsEvent, tableConfig *BinLogTabl
 }
 
 // notifyHandlers 通知所有处理函数
-func (h *binlogHandler) notifyHandlers(dbName, tableName, columnName string, oldVal, newVal interface{}, fullRow map[string]interface{}) {
+func (h *binlogHandler) notifyHandlers(dbName, tableName, columnName string, oldVal, newVal interface{}, oldFullRow, newFullRow map[string]interface{}) {
 	for _, handler := range h.handlers {
-		handler(dbName, tableName, columnName, oldVal, newVal, fullRow)
+		handler(dbName, tableName, columnName, oldVal, newVal, oldFullRow, newFullRow)
 	}
 }
 
@@ -233,13 +254,24 @@ func (h *binlogHandler) String() string {
 	return fmt.Sprintf("BinlogHandler[db:%s, tables:%s]", h.config.Database, strings.Join(tables, ";"))
 }
 
-// 修改WatcherEngine函数
-func WatcherEngine(dbName, tableName, columnName string, oldVal, newVal interface{}, fullRow map[string]interface{}) {
+// WatcherEngine 处理字段变更事件
+func WatcherEngine(dbName, tableName, columnName string, oldVal, newVal interface{}, oldFullRow, newFullRow map[string]interface{}, osmoAddr string) {
 	log.Printf("[%s.%s] 字段名 %s 从 %v 更新为 %v",
 		dbName, tableName, columnName, oldVal, newVal)
-	log.Printf("完整行数据: %+v", fullRow)
+	log.Printf("原始完整行数据: %+v", oldFullRow)
+	log.Printf("新完整行数据: %+v", newFullRow)
 
 	if tableName == "polaris_task_record" {
-		PolarisTaskRecordWatcher(columnName, oldVal, newVal, fullRow)
+		err := PolarisTaskRecordWatcher(columnName, oldVal, newVal, oldFullRow, newFullRow, osmoAddr)
+		if err != nil {
+			log.Printf("监听表PolarisTaskRecord出错: %v", err)
+		}
+	}
+	if tableName == "polaris_traffic_pool" {
+		err := PolarisTrafficPoolWatcher(columnName, oldVal, newVal, oldFullRow, newFullRow, osmoAddr)
+		if err != nil {
+			log.Printf("监听表PolarisTrafficPool出错: %v", err)
+		}
+
 	}
 }

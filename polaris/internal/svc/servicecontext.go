@@ -61,8 +61,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		panic(err)
 	}
 	// 注册处理函数
-	watcher.AddHandler(func(dbName, tableName, columnName string, oldVal, newVal interface{}, fullRow map[string]interface{}) {
-		binlog.WatcherEngine(dbName, tableName, columnName, oldVal, newVal, fullRow)
+	watcher.AddHandler(func(dbName, tableName, columnName string, oldVal, newVal interface{}, fullRow map[string]interface{}, oldFullRow map[string]interface{}) {
+		binlog.WatcherEngine(dbName, tableName, columnName, oldVal, newVal, fullRow, oldFullRow, c.Osmo.Addr)
 	})
 	// 启动监听
 	if err := watcher.Start(); err != nil {

@@ -11,7 +11,7 @@ export async function trafficPoolQueryPageApi(
   data: TrafficPoolNamespace.TrafficPoolQueryPageParams,
 ) {
   return requestClient.post<TrafficPoolNamespace.TrafficPoolQueryPageResult>(
-    '/polariss/traffic/pool/page',
+    '/polaris/traffic/pool/page',
     data,
   );
 }

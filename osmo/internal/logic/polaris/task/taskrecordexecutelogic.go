@@ -35,7 +35,7 @@ func (l *TaskRecordExecuteLogic) TaskRecordExecute(req *types.TaskRecordExecuteR
 	result := l.svcCtx.DB.Model(&model.PolarisTaskRecord{}).
 		Where("id = ?", req.ID).
 		Updates(map[string]interface{}{
-			"status":       constant.TaskStatusRunning,
+			"status":       constant.TaskStatusWaiting,
 			"execute_time": time.Now(),
 		})
 

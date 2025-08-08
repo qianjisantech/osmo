@@ -12,6 +12,8 @@ type (
         PageSize int `json:"page_size"`            //页最大数量
         Page int `json:"page"`                     //当前页
         Keyword string `json:"keyword"`            // 关键字
+        Method string  `json:"method,optional"`    //请求方式
+        RecordTimeRange []string  `json:"record_time_range"`    //录制时间
     }
     TrafficPoolQueryPageResp {
         Success bool `json:"success"`
@@ -31,6 +33,7 @@ type (
         ResponseHeaders string `json:"response_headers"`
         Method string `json:"method"`
         HttpType string   `json:"http_type"`
+        RecordTime string `json:"record_time"`
     }
     TrafficPoolDetailReq{
 

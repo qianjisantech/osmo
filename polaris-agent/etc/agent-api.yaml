@@ -2,9 +2,6 @@ Name: agent-api
 Host: 0.0.0.0
 Port: 80
 
-Sqlite:
-  DataSourceName : 'agent.db?_journal_mode=WAL&_sync=1&_foreign_keys=1'
-  SqlFilePath : 'doc/sql/agent.sql'
 Timer:
   Interval: 10
 

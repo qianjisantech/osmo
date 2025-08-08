@@ -1,0 +1,76 @@
+syntax = "v1"
+
+info(
+    title: "osmo后端"
+    desc: "osmo后端"
+    author: "philip.shen"
+    email: "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+type (
+    EdiResourceAgentSyncReq {
+        Id string `json:"id"`
+        IP string `json:"ip"`
+        Hostname string `json:"hostname"`
+        CPUCores int `json:"cpu_cores"`
+        CPUUsedPercent float64 `json:"cpu_used_percent"`
+        CPUFreePercent float64 `json:"cpu_free_percent"`
+        MemoryTotal uint64 `json:"memory_total"`
+        MemoryUsed uint64 `json:"memory_used"`
+        MemoryFree uint64 `json:"memory_free"`
+        MemoryUsedPercent float64 `json:"memory_used_percent"`
+        NetworkBytesSent uint64 `json:"network_bytes_sent"`
+        NetworkBytesReceive uint64 `json:"network_bytes_receive"`
+        NetworkPacketsSent uint64 `json:"network_packets_sent"`
+        NetworkPacketsReceive uint64 `json:"network_packets_receive"`
+        Status string `json:"status"`
+    }
+        //  ResourceAgentQueryPageResp 执行机分页查询返回体
+    EdiResourceAgentSyncResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+    EdiTaskRecordyncReq {
+        Id string `json:"id"`
+        Status string `json:"status"`
+        FailReason string `json:"fail_reason,optional"`
+        ExecuteTime string `json:"execute_time,optional"`
+    }
+
+    EdiTaskRecordyncResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+    EdiTrafficPoolSyncReq {
+        Id string `json:"id"`
+        ResponseHeaders string `json:"response_headers"`
+        ResponseBody string `json:"response_body"`
+        RequestHeaders string `json:"request_headers"`
+        RequestBody string `json:"request_body"`
+        Method string `json:"method"`
+        Url string `json:"url"`
+        TaskId string  `json:"task_id"`
+        HttpType string `json:"http_type"`
+    }
+    EdiTrafficPoolSyncResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+)
+
+@server(
+    group: edi
+    prefix: /edi
+)
+service osmo-api {
+    // 监控中心向平台同步执行机信息
+    @handler EdiResourceAgentSync
+    post /resource/agent/sync (EdiResourceAgentSyncReq) returns (EdiResourceAgentSyncResp)
+
+    // 监控中心向平台同步录制任务信息
+    @handler EdiTaskRecordync
+    post /task/record/sync (EdiTaskRecordyncReq) returns (EdiTaskRecordyncResp)
+    // 监控中心向平台同步流量
+    @handler EdiTrafficPoolSync
+    post /traffic/pool/sync (EdiTrafficPoolSyncReq) returns (EdiTrafficPoolSyncResp)
+}

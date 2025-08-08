@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	auth "osmo/internal/handler/auth"
+	edi "osmo/internal/handler/edi"
 	polarisresource "osmo/internal/handler/polaris/resource"
 	polaristask "osmo/internal/handler/polaris/task"
 	polaristraffic "osmo/internal/handler/polaris/traffic"
@@ -34,6 +35,27 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/auth"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/resource/agent/sync",
+				Handler: edi.EdiResourceAgentSyncHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/task/record/sync",
+				Handler: edi.EdiTaskRecordyncHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/traffic/pool/sync",
+				Handler: edi.EdiTrafficPoolSyncHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/edi"),
 	)
 
 	server.AddRoutes(

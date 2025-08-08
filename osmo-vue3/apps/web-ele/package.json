@@ -49,6 +49,7 @@
     "monaco-editor": "^0.52.2",
     "pinia": "catalog:",
     "vue": "catalog:",
+    "vue-json-viewer": "catalog:",
     "vue-router": "catalog:"
   },
   "devDependencies": {

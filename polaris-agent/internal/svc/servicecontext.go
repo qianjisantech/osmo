@@ -3,7 +3,7 @@ package svc
 import (
 	"context"
 	"github.com/qianjisantech/gosmo-agent/internal/config"
-	"github.com/qianjisantech/gosmo-agent/task"
+	"github.com/qianjisantech/gosmo-agent/internal/task"
 	"github.com/qianjisantech/polaris-discovery-sdk/core"
 	"github.com/shirou/gopsutil/v3/process"
 	"gorm.io/gorm"
@@ -84,7 +84,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		ShutdownChan:    make(chan struct{}),
 		TaskCounter:     &TaskCounter{MaxTasks: maxConcurrent},
 		ResourceMonitor: monitor,
-		TaskManager:     task.NewTaskManager(10),
+		TaskManager:     task.NewTaskManager(5, c.Polaris.Discovery.Addr),
 	}
 	err := client.Start(
 		func(resp *core.RegisterResponse) {

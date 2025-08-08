@@ -1,6 +1,9 @@
 import "discovery/discovery.api"
 import "config/config.api"
-import "task/task.api"
+import "edi/task.api"
+import "edi/agent.api"
+import "inner/task.api"
+import "inner/agent.api"
 
 info
 (
