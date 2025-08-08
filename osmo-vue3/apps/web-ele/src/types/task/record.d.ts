@@ -1,5 +1,4 @@
 import type { GlobalNamespace } from '#/types/global';
-import {o} from "vitest/dist/chunks/reporters.d.BFLkQcL6";
 
 // task.d.ts
 
@@ -29,11 +28,10 @@ export namespace TaskRecordNameSpace {
   export interface TaskRecordQueryPageParams
     extends GlobalNamespace.QueryPageParams {
     keyword: string;
-    agent: string;
-    rule: string;
-    strategy: string;
+    agent?: string | undefined;
+    strategy?: string | undefined;
     create_time_range: string[];
-    status: string;
+    status?: string | undefined;
   }
   export interface TaskRecordQueryPageRecord {
     id: string;

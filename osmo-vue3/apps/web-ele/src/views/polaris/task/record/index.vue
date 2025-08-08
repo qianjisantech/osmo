@@ -3,12 +3,8 @@ import type { TaskRecordNameSpace } from '#/types/task/record';
 
 import { computed, onMounted, reactive, ref } from 'vue';
 
-import {
-  Document,
-  Plus,
-  Refresh,
-  Search,
-} from '@element-plus/icons-vue';
+import { Document, Plus, Refresh, Search } from '@element-plus/icons-vue';
+import dayjs from 'dayjs'; // 推荐使用dayjs处理日期
 import {
   ElButton,
   ElCard,
@@ -27,7 +23,7 @@ import {
 } from 'element-plus';
 
 import { useTaskRecordStore } from '#/store/polaris/task/record';
-import dayjs from 'dayjs'; // 推荐使用dayjs处理日期
+
 import ExecuteConfirmDialog from './components/ExecuteConfirmDialog.vue';
 import TaskFormDialog from './components/TaskFormDialog.vue';
 
@@ -46,12 +42,11 @@ const page_size = ref(10);
 const filterForm: TaskRecordNameSpace.TaskRecordQueryPageParams = reactive({
   page: page.value,
   page_size: page_size.value,
-  rule: '',
-  strategy: '',
+  strategy: 'all',
   keyword: '',
-  agent: '',
+  agent: 'all',
   create_time_range: [],
-  status: '',
+  status: 'all',
 });
 const taskRecords = computed(
   () => taskRecordStore.taskRecordQueryPageResult.records || [],
@@ -63,9 +58,14 @@ const paginated_task_records = computed(() => {
 });
 // 修改后的刷新数据方法
 const handleQueryPage = async () => {
-  await taskRecordStore.queryPage({
-    ...filterForm,
-  });
+  const { strategy, agent, status, ...rest } = filterForm;
+  const requestParams = {
+    ...rest,
+    ...(strategy !== 'all' && { strategy }),
+    ...(agent !== 'all' && { agent }),
+    ...(status !== 'all' && { status }),
+  };
+  await taskRecordStore.queryPage(requestParams);
 };
 const getTaskStatusText = (status: string): string => {
   const map: Record<'default' | TaskRecordNameSpace.TaskStatus, string> = {
@@ -115,32 +115,7 @@ const form = reactive<TaskRecordNameSpace.TaskRecordCreateForm>({
   listen_port: '80', // 默认监听80端口
   record_time: [
     now.format('YYYY-MM-DD HH:mm:ss'),
-    endOfDay.format('YYYY-MM-DD HH:mm:ss')
-  ],
-});
-const mockData = reactive({
-  strategies: [
-    {
-      id: '1',
-      value: 'live',
-      name: '实时录制',
-      description:
-        '立即启动流量录制，实时捕获所有匹配规则的请求流量，适用于即时分析和调试场景',
-    },
-    {
-      id: '2',
-      value: 'scheduled',
-      name: '定时录制',
-      description:
-        '按照预设时间计划自动执行录制任务，支持周期性录制配置，适用于定期数据采集和分析',
-    },
-  ],
-  agents: [
-    {
-      id: '1946088688127578112',
-      name: '北京节点-执行机01',
-      execute_status: 'idle',
-    },
+    endOfDay.format('YYYY-MM-DD HH:mm:ss'),
   ],
 });
 const handleSubmitTask = async (
@@ -171,8 +146,7 @@ const confirmExecute = async () => {
   if (!confirmDialog.currentTask) return;
   try {
     // 这里添加实际执行任务的逻辑
-    await taskRecordStore.executeFunc(confirmDialog.currentTask.id)
-
+    await taskRecordStore.executeFunc(confirmDialog.currentTask.id);
   } catch (error: unknown) {
     if (error instanceof Error) {
       ElMessage.error(error.message);
@@ -183,7 +157,7 @@ const confirmExecute = async () => {
   } finally {
     confirmDialog.visible = false;
     confirmDialog.currentTask = null;
-   await handleQueryPage();
+    await handleQueryPage();
   }
 };
 // 组件挂载时加载数据
@@ -248,10 +222,13 @@ onMounted(() => {
                 placeholder="任务状态"
                 clearable
               >
-                <ElOption label="全部" value="" />
+                <ElOption label="全部" value="all" />
                 <ElOption label="待定" value="pending" />
+                <ElOption label="等待" value="waiting" />
                 <ElOption label="运行中" value="running" />
+                <ElOption label="失败" value="fail" />
                 <ElOption label="成功" value="success" />
+                <ElOption label="关闭" value="closed" />
               </ElSelect>
             </div>
             <div class="form-item">
@@ -319,17 +296,11 @@ onMounted(() => {
         <ElTableColumn label="操作" width="250">
           <template #default="{ row }">
             <div class="action-buttons">
-              <ElButton  link type="primary" size="small">
-                查看
-              </ElButton>
+              <ElButton link type="primary" size="small"> 查看 </ElButton>
               <ElButton link type="warning" size="small">
-                <ElIcon>
-                  编辑
-                </ElIcon>
+                <ElIcon> 编辑 </ElIcon>
               </ElButton>
-              <ElButton  link type="danger" size="small">
-                删除
-              </ElButton>
+              <ElButton link type="danger" size="small"> 删除 </ElButton>
               <ElButton
                 link
                 type="primary"
@@ -359,8 +330,6 @@ onMounted(() => {
       v-model:visible="showDialog"
       :form-data="form"
       @submit="handleSubmitTask"
-      :strategies="mockData.strategies"
-      :agents="mockData.agents"
     />
     <ExecuteConfirmDialog
       v-model:visible="confirmDialog.visible"

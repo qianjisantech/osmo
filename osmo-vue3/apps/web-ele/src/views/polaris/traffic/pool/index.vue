@@ -127,13 +127,13 @@ onMounted(() => {
     <ElCard class="mb-6">
       <div class="mb-2 flex items-start justify-between">
         <div class="flex space-x-3">
-          <ElButton @click="handleReset">
-            <ElIcon class="mr-1"><Refresh /></ElIcon>
-            重置
-          </ElButton>
           <ElButton type="primary" @click="handleSearch">
             <ElIcon class="mr-1"><Search /></ElIcon>
             查询
+          </ElButton>
+          <ElButton @click="handleReset">
+            <ElIcon class="mr-1"><Refresh /></ElIcon>
+            重置
           </ElButton>
         </div>
       </div>
