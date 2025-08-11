@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	recorder "github.com/qianjisantech/gosmo"
 	"github.com/qianjisantech/gosmo-agent/internal/common/util"
 	"github.com/qianjisantech/gosmo-agent/internal/config"
