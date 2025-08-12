@@ -100,6 +100,9 @@ func (l *TaskRecordQueryPageLogic) TaskRecordQueryPage(req *types.TaskRecordQuer
 			EndTime:      endTime,
 			ListenPort:   taskRecord.ListenPort,
 			ExecuteTime:  executeTime,
+			MonitorAddr:  taskRecord.MonitorAddr,
+			MonitorId:    taskRecord.MonitorID,
+			MonitorName:  taskRecord.MonitorName,
 		})
 	}
 

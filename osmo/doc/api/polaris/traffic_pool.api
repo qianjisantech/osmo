@@ -14,6 +14,7 @@ type (
         Keyword string `json:"keyword"`            // 关键字
         Method string  `json:"method,optional"`    //请求方式
         RecordTimeRange []string  `json:"record_time_range"`    //录制时间
+        Id string  `json:"id,optional"`
     }
     TrafficPoolQueryPageResp {
         Success bool `json:"success"`

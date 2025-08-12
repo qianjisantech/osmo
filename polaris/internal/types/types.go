@@ -13,7 +13,6 @@ type ConfigHotLoadingResp struct {
 type DiscoveryHeatBeatReq struct {
 	IdentificationCode    string  `path:"identification_code"`
 	IP                    string  `json:"ip"`
-	Status                string  `json:"status"`
 	Hostname              string  `json:"hostname"`
 	CPUCores              int     `json:"cpu_cores"`
 	CPUUsedPercent        float64 `json:"cpu_used_percent"`
@@ -26,6 +25,8 @@ type DiscoveryHeatBeatReq struct {
 	NetworkBytesReceive   int64   `json:"network_bytes_receive"`
 	NetworkPacketsSent    int64   ` json:"network_packets_sent"`
 	NetworkPacketsReceive int64   ` json:"network_packets_receive"`
+	ExecuteStatus         string  `json:"execute_status"`
+	Status                string  `json:"status"`
 }
 
 type DiscoveryHeatBeatResp struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/logx"
+	"log"
 	"osmo/gen/query"
 	"osmo/internal/common/errorx"
 	"osmo/internal/svc"
@@ -39,10 +40,21 @@ func (l *TrafficPoolQueryPageLogic) TrafficPoolQueryPage(req *types.TrafficPoolQ
 		queryBuilder = queryBuilder.Where(
 			q.URL.Like("%" + req.Keyword + "%"))
 	}
-	// 添加关键词搜索条件
+	// 添加Method搜索条件
 	if req.Method != "" {
 		queryBuilder = queryBuilder.Where(
 			q.Method.Eq(req.Method))
+	}
+	if req.Id != "" {
+		// 将字符串ID转换为int64
+		id, err := strconv.ParseInt(req.Id, 10, 64)
+		if err != nil {
+			log.Printf("ID格式不正确: %v", err)
+		} else {
+			queryBuilder = queryBuilder.Where(
+				q.ID.Eq(id))
+		}
+
 	}
 	if len(req.RecordTimeRange) == 0 {
 		return nil, errorx.NewDefaultErrorf("筛选条件录制时间范围不能为空")

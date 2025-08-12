@@ -8,6 +8,7 @@ export namespace TrafficPoolNamespace {
     keyword: string;
     method?: string | undefined;
     record_time_range: string[];
+    id: string;
   }
 
   /** 执行机监控分页查询返回值Agent */

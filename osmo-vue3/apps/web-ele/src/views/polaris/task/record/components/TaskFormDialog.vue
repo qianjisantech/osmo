@@ -24,10 +24,6 @@ const props = defineProps({
     type: Object as () => TaskRecordNameSpace.TaskRecordCreateForm,
     required: true,
   },
-  strategies: {
-    type: Array<TaskRecordNameSpace.RecordStrategy>,
-    default: () => [],
-  },
 });
 const emit = defineEmits(['update:visible', 'submit', 'update:form-data']);
 const agentStore = useAgentStore();
@@ -45,7 +41,7 @@ watch(
 const agentFocusParams = reactive({
   keyword: '',
   status: ['healthy'],
-  execute_status: ['idle', 'busy'],
+  execute_status: ['free', 'busy'],
 });
 const agentListLoading = ref(false); // 单独控制执行机列表加载状态
 const hasLoadedAgentList = ref(false); // 标记是否已加载过执行机列表
@@ -58,6 +54,26 @@ const loadAgentList = async () => {
     console.error('加载执行机列表错误:', error);
   }
 };
+interface MonitorOption {
+  id: string;
+  name: string;
+  addr: string;
+  status: string;
+}
+const monitorOptions = reactive<MonitorOption[]>([
+  {
+    id: '1',
+    name: '云仓生产集群监控中心',
+    addr: 'http://localhost:8080',
+    status: 'online',
+  },
+  {
+    id: '2',
+    name: '云仓测试集群监控中心',
+    addr: 'http://localhost:8080',
+    status: 'online',
+  },
+]);
 const agentSelectOptions = computed(() => agentStore.agentSelectOptions || []);
 // Form validation rules
 const rules = {
@@ -84,16 +100,18 @@ const loadingStates = reactive({
   rules: false,
   agents: false,
 });
-
-// Search methods
-const searchStrategies = async (query = '') => {
-  loadingStates.strategies = true;
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  loadingStates.strategies = false;
-  return props.strategies.filter(
-    (item) => item.name.includes(query) || item.value.includes(query),
-  );
-};
+const strategies: TaskRecordNameSpace.RecordStrategy[] = [
+  {
+    id: '1',
+    value: 'live',
+    name: '实时录制',
+  },
+  {
+    id: '2',
+    value: 'schedule',
+    name: '定时录制',
+  },
+];
 
 const handleStrategyChange = (value: TaskRecordNameSpace.RecordStrategy) => {
   form.value = {
@@ -241,44 +259,42 @@ const closeDialog = () => {
         <ElFormItem label="任务名称" prop="name" class="form-item-full">
           <ElInput v-model="form.name" placeholder="请输入任务名称" clearable />
         </ElFormItem>
-<!--        <ElFormItem label="监控中心" prop="agent" class="form-item">-->
-<!--          <ElSelect-->
-<!--            value-key="id"-->
-<!--            v-model="form.agent"-->
-<!--            @change="handleAgentChange"-->
-<!--            remote-->
-<!--            placeholder="请选择监控中心"-->
-<!--            clearable-->
-<!--            filterable-->
-<!--            :loading="agentListLoading"-->
-<!--            @focus="handleSelectFocus"-->
-<!--            @visible-change="handleSelectFocus"-->
-<!--            class="select-input"-->
-<!--          >-->
-<!--            <ElOption-->
-<!--              v-for="item in agentSelectOptions"-->
-<!--              :key="item.id"-->
-<!--              :label="item.key"-->
-<!--              :value="item"-->
-<!--            >-->
-<!--              <div class="option-content">-->
-<!--                <div class="option-header">-->
-<!--                  <span class="option-label">{{ item.key }}</span>-->
-<!--                  <div class="option-meta">{{ item.value }}</div>-->
-<!--                  <ElTag-->
-<!--                    :type="-->
-<!--                      item.execute_status === 'idle' ? 'success' : 'warning'-->
-<!--                    "-->
-<!--                    size="small"-->
-<!--                    class="option-tag"-->
-<!--                  >-->
-<!--                    {{ item.execute_status === 'idle' ? '空闲' : '忙碌' }}-->
-<!--                  </ElTag>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </ElOption>-->
-<!--          </ElSelect>-->
-<!--        </ElFormItem>-->
+        <ElFormItem label="监控中心" prop="agent" class="form-item">
+          <ElSelect
+            value-key="id"
+            v-model="form.monitor"
+            @change="handleAgentChange"
+            remote
+            placeholder="请选择监控中心"
+            clearable
+            filterable
+            :loading="agentListLoading"
+            @focus="handleSelectFocus"
+            @visible-change="handleSelectFocus"
+            class="select-input"
+          >
+            <ElOption
+              v-for="item in monitorOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item"
+            >
+              <div class="option-content">
+                <div class="option-header">
+                  <span class="option-label">{{ item.name }}</span>
+                  <div class="option-meta">{{ item.addr }}</div>
+                  <ElTag
+                    :type="item.status === 'online' ? 'success' : 'warning'"
+                    size="small"
+                    class="option-tag"
+                  >
+                    {{ item.status === 'online' ? '在线' : '离线' }}
+                  </ElTag>
+                </div>
+              </div>
+            </ElOption>
+          </ElSelect>
+        </ElFormItem>
         <ElFormItem label="执行机" prop="agent" class="form-item">
           <ElSelect
             value-key="id"
@@ -305,12 +321,12 @@ const closeDialog = () => {
                   <div class="option-meta">{{ item.value }}</div>
                   <ElTag
                     :type="
-                      item.execute_status === 'idle' ? 'success' : 'warning'
+                      item.execute_status === 'free' ? 'success' : 'warning'
                     "
                     size="small"
                     class="option-tag"
                   >
-                    {{ item.execute_status === 'idle' ? '空闲' : '忙碌' }}
+                    {{ item.execute_status === 'free' ? '空闲' : '忙碌' }}
                   </ElTag>
                 </div>
               </div>
@@ -326,9 +342,7 @@ const closeDialog = () => {
             placeholder="请选择任务策略"
             filterable
             remote
-            :remote-method="searchStrategies"
             :loading="loadingStates.strategies"
-            @focus="searchStrategies()"
             class="select-input"
           >
             <ElOption

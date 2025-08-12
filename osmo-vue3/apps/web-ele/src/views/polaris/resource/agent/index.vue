@@ -90,6 +90,11 @@ const getStatusMapping = (status: string): StatusMapping => {
   }
   return defaultMapping;
 };
+const pagination = reactive({
+  current_page: 1,
+  page_size: 10,
+  total: computed(() => agentStore.agentQueryPageResult.total),
+});
 
 // 获取状态标签信息
 const getStatusTag = (status: string) => {
@@ -209,7 +214,31 @@ const openConsoleDrawer = (agent: ResourceAgentNamespace.Agent) => {
   currentId.value = agent.id as string;
   showConsoleDrawer.value = true;
 };
+const handleSizeChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page_size = val;
+    filterForm.page = 1; // 重置到第一页
+    pagination.current_page = 1;
+    await handleRefreshData();
+  } catch (error) {
+    console.error('切换分页大小失败:', error);
+  } finally {
+    loading.value = false;
+  }
+};
 
+const handleCurrentChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page = val;
+    await handleRefreshData();
+  } catch (error) {
+    console.error('切换当前页失败:', error);
+  } finally {
+    loading.value = false;
+  }
+};
 // 组件挂载时加载数据
 onMounted(() => {
   handleRefreshData();
@@ -430,13 +459,13 @@ onMounted(() => {
           <!-- 分页 -->
           <div class="mt-4 flex justify-end">
             <ElPagination
-              v-model:current-page="page"
-              v-model:page-size="page_size"
+              v-model:current-page="pagination.current_page"
+              v-model:page-size="pagination.page_size"
               :page-sizes="[10, 20, 50, 100]"
               layout="total, sizes, prev, pager, next, jumper"
-              :total="agents.length"
-              @size-change="handleRefreshData"
-              @current-change="handleRefreshData"
+              :total="pagination.total"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
             />
           </div>
         </div>

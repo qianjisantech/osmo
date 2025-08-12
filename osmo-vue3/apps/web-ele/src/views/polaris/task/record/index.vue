@@ -20,6 +20,7 @@ import {
   ElTable,
   ElTableColumn,
   ElTag,
+  ElText
 } from 'element-plus';
 
 import { useTaskRecordStore } from '#/store/polaris/task/record';
@@ -27,6 +28,7 @@ import { useTaskRecordStore } from '#/store/polaris/task/record';
 import ExecuteConfirmDialog from './components/ExecuteConfirmDialog.vue';
 import TaskFormDialog from './components/TaskFormDialog.vue';
 
+const loading = ref(false);
 const taskRecordStore = useTaskRecordStore();
 const showDialog = ref(false);
 // 添加确认弹窗状态
@@ -36,12 +38,16 @@ const confirmDialog = reactive({
 });
 // 状态管理
 const activeCollapse = ref(['1']);
-const page = ref(1);
-const page_size = ref(10);
+const pagination = reactive({
+  current_page: 1,
+  page_size: 10,
+  total: computed(() => taskRecordStore.taskRecordQueryPageResult.total),
+});
+
 // 筛选表单
 const filterForm: TaskRecordNameSpace.TaskRecordQueryPageParams = reactive({
-  page: page.value,
-  page_size: page_size.value,
+  page: pagination.current_page,
+  page_size: pagination.page_size,
   strategy: 'all',
   keyword: '',
   agent: 'all',
@@ -52,8 +58,8 @@ const taskRecords = computed(
   () => taskRecordStore.taskRecordQueryPageResult.records || [],
 );
 const paginated_task_records = computed(() => {
-  const start = (page.value - 1) * page_size.value;
-  const end = start + page_size.value;
+  const start = (pagination.current_page - 1) * pagination.page_size;
+  const end = start + pagination.page_size;
   return taskRecords.value.slice(start, end);
 });
 // 修改后的刷新数据方法
@@ -109,14 +115,14 @@ const endOfDay = dayjs().endOf('day'); // 当天23:59:59
 const form = reactive<TaskRecordNameSpace.TaskRecordCreateForm>({
   id: '',
   name: '',
-  strategy: {},
   agent: {},
   description: '',
-  listen_port: '80', // 默认监听80端口
+  listen_port: '9999', // 默认监听80端口
   record_time: [
     now.format('YYYY-MM-DD HH:mm:ss'),
     endOfDay.format('YYYY-MM-DD HH:mm:ss'),
   ],
+  monitor: {},
 });
 const handleSubmitTask = async (
   formData: TaskRecordNameSpace.TaskRecordCreateForm,
@@ -160,6 +166,40 @@ const confirmExecute = async () => {
     await handleQueryPage();
   }
 };
+const handleSizeChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page_size = val;
+    filterForm.page = 1; // 重置到第一页
+    pagination.current_page = 1;
+    await handleQueryPage();
+  } catch (error) {
+    console.error('切换分页大小失败:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleCurrentChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page = val;
+    await handleQueryPage();
+  } catch (error) {
+    console.error('切换当前页失败:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+const handleReset = () => {
+  filterForm.keyword = '';
+  filterForm.strategy = 'all';
+  filterForm.agent = 'all';
+  filterForm.status = 'all';
+  filterForm.page = 1;
+  filterForm.page_size = 20;
+  handleQueryPage();
+};
 // 组件挂载时加载数据
 onMounted(() => {
   handleQueryPage();
@@ -176,7 +216,7 @@ onMounted(() => {
             <ElIcon class="mr-1"><Search /></ElIcon>
             查询
           </ElButton>
-          <ElButton @click="handleQueryPage">
+          <ElButton @click="handleReset">
             <ElIcon class="mr-1"><Refresh /></ElIcon>
             重置
           </ElButton>
@@ -227,6 +267,7 @@ onMounted(() => {
                 <ElOption label="等待" value="waiting" />
                 <ElOption label="运行中" value="running" />
                 <ElOption label="失败" value="fail" />
+                <ElOption label="中止" value="aborted" />
                 <ElOption label="成功" value="success" />
                 <ElOption label="关闭" value="closed" />
               </ElSelect>
@@ -257,12 +298,32 @@ onMounted(() => {
             </ElTag>
           </template>
         </ElTableColumn>
-
-        <ElTableColumn label="关联执行机">
+        <ElTableColumn label="监控中心名称" width="100">
           <template #default="{ row }">
-            <ElTag type="danger">
-              {{ row.agent_name }}
+            <ElText type="danger">
+              {{ row.monitor_name }}
+            </ElText>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="监控中心地址" width="100">
+          <template #default="{ row }">
+            <ElText type="danger">
+              {{ row.monitor_addr }}
+            </ElText>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="录制时间" width="300">
+          <template #default="{ row }">
+            <ElTag type="primary">
+              {{ `${row.start_time}-${row.end_time}` }}
             </ElTag>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="关联执行机" width="100">
+          <template #default="{ row }">
+            <ElText type="danger">
+              {{ row.agent_name }}
+            </ElText>
           </template>
         </ElTableColumn>
         <ElTableColumn label="录制时间" width="300">
@@ -317,11 +378,13 @@ onMounted(() => {
       <!-- 分页 -->
       <div class="mt-4 flex justify-end">
         <ElPagination
-          v-model:current-page="page"
-          v-model:page-size="page_size"
+          v-model:current-page="pagination.current_page"
+          v-model:page-size="pagination.page_size"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="taskRecords.length"
+          :total="pagination.total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
         />
       </div>
     </ElCard>

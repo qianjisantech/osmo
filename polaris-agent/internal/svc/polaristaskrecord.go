@@ -1,8 +1,8 @@
 package svc
 
 import (
-	"github.com/qianjisantech/gosmo-agent/internal/constant"
-	"github.com/qianjisantech/polaris-discovery-sdk/core"
+	"github.com/qianjisantech/polaris-agent/discovery/core"
+	"github.com/qianjisantech/polaris-agent/internal/constant"
 	"github.com/zeromicro/go-zero/core/logx"
 	"strconv"
 )

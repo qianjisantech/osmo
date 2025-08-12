@@ -5,7 +5,8 @@ import { reactive, ref } from 'vue';
 import { defineStore } from 'pinia';
 
 import {
-  agentCreateApi, taskRecordExecuteApi,
+  agentCreateApi,
+  taskRecordExecuteApi,
   taskRecordQueryPageApi,
 } from '#/api/polaris/task/record';
 
@@ -32,7 +33,7 @@ export const useTaskRecordStore = defineStore('taskRecord', () => {
         records,
         total,
       });
-
+      console.log('taskRecordQueryPageResult', taskRecordQueryPageResult);
       return taskRecordQueryPageResult;
     } catch (error) {
       // 错误时重置数据
@@ -54,6 +55,7 @@ export const useTaskRecordStore = defineStore('taskRecord', () => {
     try {
       queryLoading.value = true;
       await agentCreateApi(params);
+      // eslint-disable-next-line no-useless-catch
     } catch (error) {
       throw error;
     } finally {
@@ -65,7 +67,7 @@ export const useTaskRecordStore = defineStore('taskRecord', () => {
    * 执行录制任务
    * @param id
    */
-  async function executeFunc(id:string) {
+  async function executeFunc(id: string) {
     try {
       queryLoading.value = true;
       await taskRecordExecuteApi(id);
@@ -75,11 +77,12 @@ export const useTaskRecordStore = defineStore('taskRecord', () => {
       queryLoading.value = false;
     }
   }
+
   return {
     queryPage,
     queryLoading,
     taskRecordQueryPageResult,
     createFunc,
-    executeFunc
+    executeFunc,
   };
 });

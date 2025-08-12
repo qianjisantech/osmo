@@ -43,6 +43,9 @@ type PolarisTaskRecord struct {
 	TotalRecordAPI    *int32     `gorm:"column:total_record_api" json:"total_record_api"`
 	SuccessRecordAPI  *int32     `gorm:"column:success_record_api" json:"success_record_api"`
 	FailRecordAPI     *int32     `gorm:"column:fail_record_api" json:"fail_record_api"`
+	MonitorID         string     `gorm:"column:monitor_id;not null" json:"monitor_id"`
+	MonitorName       string     `gorm:"column:monitor_name;not null" json:"monitor_name"`
+	MonitorAddr       string     `gorm:"column:monitor_addr;not null" json:"monitor_addr"`
 }
 
 // TableName PolarisTaskRecord's table name

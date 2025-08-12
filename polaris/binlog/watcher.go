@@ -261,17 +261,27 @@ func WatcherEngine(dbName, tableName, columnName string, oldVal, newVal interfac
 	log.Printf("原始完整行数据: %+v", oldFullRow)
 	log.Printf("新完整行数据: %+v", newFullRow)
 
-	if tableName == "polaris_task_record" {
+	switch tableName {
+	case "polaris_task_record":
 		err := PolarisTaskRecordWatcher(columnName, oldVal, newVal, oldFullRow, newFullRow, osmoAddr)
 		if err != nil {
 			log.Printf("监听表PolarisTaskRecord出错: %v", err)
 		}
-	}
-	if tableName == "polaris_traffic_pool" {
+		break
+	case "polaris_traffic_pool":
 		err := PolarisTrafficPoolWatcher(columnName, oldVal, newVal, oldFullRow, newFullRow, osmoAddr)
 		if err != nil {
 			log.Printf("监听表PolarisTrafficPool出错: %v", err)
 		}
-
+		break
+	case "polaris_resource_agent":
+		err := PolarisResourceAgentWatcher(columnName, oldVal, newVal, oldFullRow, newFullRow, osmoAddr)
+		if err != nil {
+			log.Printf("监听表PolarisResourceAgent出错: %v", err)
+		}
+		break
+	default:
+		log.Printf("监听表%s未定义处理逻辑", tableName)
 	}
+
 }

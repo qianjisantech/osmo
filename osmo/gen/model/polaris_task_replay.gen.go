@@ -12,25 +12,35 @@ const TableNamePolarisTaskReplay = "polaris_task_replay"
 
 // PolarisTaskReplay mapped from table <polaris_task_replay>
 type PolarisTaskReplay struct {
-	ID            int64      `gorm:"column:id;primaryKey" json:"id"`
-	Name          string     `gorm:"column:name;not null" json:"name"`
-	Status        string     `gorm:"column:status;not null;comment:任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）" json:"status"` // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
-	IsDeleted     bool       `gorm:"column:is_deleted;not null;->;comment:逻辑删除标识（0 未删除；1 已删除）" json:"is_deleted"`                                                                                            // 逻辑删除标识（0 未删除；1 已删除）
-	DeletedTime   *time.Time `gorm:"column:deleted_time" json:"deleted_time"`
-	DeletedBy     *string    `gorm:"column:deleted_by" json:"deleted_by"`
-	DeletedByName *string    `gorm:"column:deleted_by_name" json:"deleted_by_name"`
-	CreateTime    time.Time  `gorm:"column:create_time;not null;default:CURRENT_TIMESTAMP;->" json:"create_time"`
-	CreateBy      string     `gorm:"column:create_by;not null" json:"create_by"`
-	CreateByName  string     `gorm:"column:create_by_name;not null" json:"create_by_name"`
-	UpdateTime    time.Time  `gorm:"column:update_time;not null;default:CURRENT_TIMESTAMP;->" json:"update_time"`
-	UpdateBy      string     `gorm:"column:update_by;not null" json:"update_by"`
-	UpdateByName  string     `gorm:"column:update_by_name;not null" json:"update_by_name"`
-	RuleID        int64      `gorm:"column:rule_id;not null;comment:规则id" json:"rule_id"`             // 规则id
-	RuleName      string     `gorm:"column:rule_name;not null;comment:规则名称" json:"rule_name"`         // 规则名称
-	StrategyID    int64      `gorm:"column:strategy_id;not null;comment:策略id" json:"strategy_id"`     // 策略id
-	StrategyName  string     `gorm:"column:strategy_name;not null;comment:策略名称" json:"strategy_name"` // 策略名称
-	AgentID       int64      `gorm:"column:agent_id;not null" json:"agent_id"`
-	AgentName     *string    `gorm:"column:agent_name" json:"agent_name"`
+	ID                 int64      `gorm:"column:id;primaryKey" json:"id"`
+	Name               string     `gorm:"column:name;not null" json:"name"`
+	Status             string     `gorm:"column:status;not null;comment:任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）" json:"status"` // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
+	IsDeleted          bool       `gorm:"column:is_deleted;not null;->;comment:逻辑删除标识（0 未删除；1 已删除）" json:"is_deleted"`                                                                                            // 逻辑删除标识（0 未删除；1 已删除）
+	DeletedTime        *time.Time `gorm:"column:deleted_time" json:"deleted_time"`
+	DeletedBy          *string    `gorm:"column:deleted_by" json:"deleted_by"`
+	DeletedByName      *string    `gorm:"column:deleted_by_name" json:"deleted_by_name"`
+	CreateTime         time.Time  `gorm:"column:create_time;not null;default:CURRENT_TIMESTAMP;->" json:"create_time"`
+	CreateBy           string     `gorm:"column:create_by;not null" json:"create_by"`
+	CreateByName       string     `gorm:"column:create_by_name;not null" json:"create_by_name"`
+	UpdateTime         time.Time  `gorm:"column:update_time;not null;default:CURRENT_TIMESTAMP;->" json:"update_time"`
+	UpdateBy           string     `gorm:"column:update_by;not null" json:"update_by"`
+	UpdateByName       string     `gorm:"column:update_by_name;not null" json:"update_by_name"`
+	RuleID             *int64     `gorm:"column:rule_id;comment:规则id" json:"rule_id"`     // 规则id
+	RuleName           *string    `gorm:"column:rule_name;comment:规则名称" json:"rule_name"` // 规则名称
+	StrategyCode       string     `gorm:"column:strategy_code;not null" json:"strategy_code"`
+	StrategyName       string     `gorm:"column:strategy_name;not null;comment:策略名称" json:"strategy_name"` // 策略名称
+	ReplayTime         *time.Time `gorm:"column:replay_time" json:"replay_time"`
+	Description        *string    `gorm:"column:description;comment:描述" json:"description"` // 描述
+	ExecuteTime        *time.Time `gorm:"column:execute_time" json:"execute_time"`
+	MonitorCenterID    string     `gorm:"column:monitor_center_id;not null" json:"monitor_center_id"`
+	MonitorCenterName  string     `gorm:"column:monitor_center_name;not null" json:"monitor_center_name"`
+	MonitorCenterURL   string     `gorm:"column:monitor_center_url;not null" json:"monitor_center_url"`
+	FailReason         *string    `gorm:"column:fail_reason" json:"fail_reason"`
+	TotalReplayAPI     *int32     `gorm:"column:total_replay_api" json:"total_replay_api"`
+	SuccessReplayAPI   *int32     `gorm:"column:success_replay_api" json:"success_replay_api"`
+	FailReplayAPI      *int32     `gorm:"column:fail_replay_api" json:"fail_replay_api"`
+	NeedReplayTraffics string     `gorm:"column:need_replay_traffics;not null" json:"need_replay_traffics"`
+	ReplayAddr         string     `gorm:"column:replay_addr;not null" json:"replay_addr"`
 }
 
 // TableName PolarisTaskReplay's table name

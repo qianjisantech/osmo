@@ -2,9 +2,10 @@ package svc
 
 import (
 	"context"
-	"github.com/qianjisantech/gosmo-agent/internal/config"
-	"github.com/qianjisantech/gosmo-agent/internal/task"
-	"github.com/qianjisantech/polaris-discovery-sdk/core"
+	"github.com/qianjisantech/polaris-agent/discovery/core"
+	"github.com/qianjisantech/polaris-agent/internal/config"
+	"github.com/qianjisantech/polaris-agent/internal/constant"
+	"github.com/qianjisantech/polaris-agent/internal/task"
 	"github.com/shirou/gopsutil/v3/process"
 	"gorm.io/gorm"
 	"log"
@@ -77,8 +78,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	monitor := &ResourceMonitor{}
 	monitor.Start()
 
-	client := &core.DiscoveryClient{Addr: c.Polaris.Discovery.Addr, HeartbeatInterval: c.Polaris.Discovery.HeartbeatInterval, Timeout: c.Polaris.Discovery.Timeout}
-	log.Printf("判断客户端是否已经启动%v", client.IsStopped())
 	scvt := &ServiceContext{
 		Config:          c,
 		ShutdownChan:    make(chan struct{}),
@@ -86,6 +85,21 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		ResourceMonitor: monitor,
 		TaskManager:     task.NewTaskManager(5, c.Polaris.Discovery.Addr),
 	}
+	activeTaskCount := scvt.TaskManager.GetActiveTaskCount()
+	client := &core.DiscoveryClient{
+		Addr:              c.Polaris.Discovery.Addr,
+		HeartbeatInterval: c.Polaris.Discovery.HeartbeatInterval,
+		Timeout:           c.Polaris.Discovery.Timeout,
+		Status:            string(constant.AgentStatusRegister),
+	}
+	if activeTaskCount > 0 {
+		client.ExecuteStatus = string(constant.AgentExecuteStatusBusy)
+	} else {
+		client.ExecuteStatus = string(constant.AgentExecuteStatusFree)
+	}
+
+	log.Printf("判断客户端是否已经启动%v", client.IsStopped())
+
 	err := client.Start(
 		func(resp *core.RegisterResponse) {
 			log.Printf("===============================注册成功回调方法! ID: %s", resp.Data.Id)

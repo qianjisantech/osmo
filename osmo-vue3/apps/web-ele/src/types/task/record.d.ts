@@ -54,6 +54,9 @@ export namespace TaskRecordNameSpace {
     agent_name: string;
     listen_port: string;
     execute_time: string;
+    monitor_id: string;
+    monitor_name: string;
+    monitor_addr: string;
   }
   export interface TaskRecordQueryPageResult {
     records: TaskRecordQueryPageRecord[];
@@ -76,11 +79,18 @@ export namespace TaskRecordNameSpace {
   export interface TaskRecordCreateForm {
     id?: string;
     name: string;
-    strategy: object;
+    strategy: RecordStrategy;
     agent: object;
     description: string;
     listen_port: string;
     record_time: string[];
+    monitor: ResourceMonitor;
+  }
+  export interface ResourceMonitor {
+    id: string;
+    name: string;
+    status: string;
+    addr: string;
   }
   export interface ResourceAgent {
     id: string;

@@ -31,8 +31,8 @@ type AuthLogoutResp struct {
 
 type EdiResourceAgentSyncReq struct {
 	Id                    string  `json:"id"`
-	IP                    string  `json:"ip"`
-	Hostname              string  `json:"hostname"`
+	Status                string  `json:"status"`
+	ExecuteStatus         string  `json:"execute_status"`
 	CPUCores              int     `json:"cpu_cores"`
 	CPUUsedPercent        float64 `json:"cpu_used_percent"`
 	CPUFreePercent        float64 `json:"cpu_free_percent"`
@@ -44,7 +44,7 @@ type EdiResourceAgentSyncReq struct {
 	NetworkBytesReceive   uint64  `json:"network_bytes_receive"`
 	NetworkPacketsSent    uint64  `json:"network_packets_sent"`
 	NetworkPacketsReceive uint64  `json:"network_packets_receive"`
-	Status                string  `json:"status"`
+	HostName              string  `json:"host_name"`
 }
 
 type EdiResourceAgentSyncResp struct {
@@ -268,6 +268,7 @@ type TaskRecordCreateReq struct {
 	Agent       *TaskRecordCreateReqAgent    `json:"agent"`
 	RecordTime  []string                     `json:"record_time"`
 	ListenPort  string                       `json:"listen_port"`
+	Monitor     *TaskRecordCreateReqMonitor  `json:"monitor"`
 }
 
 type TaskRecordCreateReqAgent struct {
@@ -275,6 +276,13 @@ type TaskRecordCreateReqAgent struct {
 	Key           string `json:"key"`
 	Value         string `json:"value"`
 	ExecuteStatus string `json:"execute_status"`
+}
+
+type TaskRecordCreateReqMonitor struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
+	Addr   string `json:"addr"`
 }
 
 type TaskRecordCreateReqStrategy struct {
@@ -333,7 +341,7 @@ type TaskRecordQueryPageReq struct {
 	Strategy        string   `json:"strategy,optional"` // 录制策略
 	Rule            string   `json:"rule,optional"`     // 录制规则
 	Status          string   `json:"status,optional"`
-	CreateTimeRaneg []string `json:"create_time_range,optional"` // 创建时间范围
+	CreateTimeRange []string `json:"create_time_range,optional"` // 创建时间范围
 }
 
 type TaskRecordQueryPageResp struct {
@@ -355,6 +363,9 @@ type TaskRecordQueryPageRespRecord struct {
 	StrategyName string `json:"strategy_name"`
 	StartTime    string `json:"start_time"`
 	EndTime      string `json:"end_time"`
+	MonitorId    string `json:"monitor_id"`
+	MonitorName  string `json:"monitor_name"`
+	MonitorAddr  string `json:"monitor_addr"`
 	AgentId      string `json:"agent_id"`
 	AgentName    string `json:"agent_name"`
 	ListenPort   string `json:"listen_port"`
@@ -376,6 +387,111 @@ type TaskRecordUpdateResp struct {
 	Message string `json:"message"`
 }
 
+type TaskReplayCreateReq struct {
+	Name               string   `json:"name"`                 // 回放任务名称
+	Description        string   `json:"description,optional"` // 描述信息
+	ReplayAddr         string   `json:"replay_addr"`
+	ReplayTime         string   `json:"replay_time"`
+	NeedReplayTraffics []string `json:"need_replay_traffics"`
+}
+
+type TaskReplayCreateReqAgent struct {
+	Id            string `json:"id"`
+	Key           string `json:"key"`
+	Value         string `json:"value"`
+	ExecuteStatus string `json:"execute_status"`
+}
+
+type TaskReplayCreateReqStrategy struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type TaskReplayCreateResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type TaskReplayDetailReq struct {
+	ID string `path:"id"` // 关键点：path 标签表示路径参数
+}
+
+type TaskReplayDetailResp struct {
+	Success bool                     `json:"success"`
+	Message string                   `json:"message"`
+	Data    TaskReplayDetailRespData `json:"data" `
+}
+
+type TaskReplayDetailRespData struct {
+	ID                               string                            `json:"id"`          // 回放任务ID
+	Name                             string                            `json:"name"`        // 回放任务名称
+	Description                      string                            `json:"description"` // 描述信息
+	Status                           string                            `json:"status"`
+	ReplayTime                       string                            `json:"replay_time"`
+	ReplayAddr                       string                            `json:"replay_addr"`
+	TaskReplayDetailRespDataTraffics []TaskReplayDetailRespDataTraffic `json:"traffics"`
+}
+
+type TaskReplayDetailRespDataTraffic struct {
+	ID     string `json:"id"`
+	Url    string `json:"url"`
+	Method string `json:"method"`
+}
+
+type TaskReplayExecuteReq struct {
+	ID string `path:"id"`
+}
+
+type TaskReplayExecuteResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type TaskReplayQueryPageReq struct {
+	PageSize        int      `json:"page_size"` //页最大数量
+	Page            int      `json:"page"`      //当前页
+	Keyword         string   `json:"keyword"`   // 关键字
+	Status          string   `json:"status,optional"`
+	ReplayTimeRange []string `json:"replay_time_range,optional"` // 创建时间范围
+}
+
+type TaskReplayQueryPageResp struct {
+	Success bool                        `json:"success"`
+	Message string                      `json:"message"`
+	Data    TaskReplayQueryPageRespData `json:"data"`
+}
+
+type TaskReplayQueryPageRespData struct {
+	Total   int                             `json:"total"`   // 总数
+	Records []TaskReplayQueryPageRespRecord `json:"records"` // 记录列表
+}
+
+type TaskReplayQueryPageRespRecord struct {
+	Id          string `json:"id"`   // 回放任务Id
+	Name        string `json:"name"` // 回放任务名称
+	Status      string `json:"status"`
+	ReplayTime  string `json:"replay_time"`
+	ReplayAddr  string `json:"replay_addr"`
+	ExecuteTime string `json:"execute_time"`
+	FailReason  string `json:"fail_reason"`
+}
+
+type TaskReplayUpdateReq struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`                 // 回放任务名称
+	Description  string `json:"description,optional"` // 描述信息
+	StrategyId   string `json:"strategy_id"`          // 回放策略id
+	StrategyName string `json:"strategy_name"`        // 回放策略名称
+	AgentId      string `json:"agent_id"`
+	AgentName    string `json:"agent_name"`
+}
+
+type TaskReplayUpdateResp struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
 type TrafficPoolDetailReq struct {
 }
 
@@ -388,6 +504,7 @@ type TrafficPoolQueryPageReq struct {
 	Keyword         string   `json:"keyword"`           // 关键字
 	Method          string   `json:"method,optional"`   //请求方式
 	RecordTimeRange []string `json:"record_time_range"` //录制时间
+	Id              string   `json:"id,optional"`
 }
 
 type TrafficPoolQueryPageResp struct {

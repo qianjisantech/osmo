@@ -58,6 +58,9 @@ func newPolarisTaskRecord(db *gorm.DB, opts ...gen.DOOption) polarisTaskRecord {
 	_polarisTaskRecord.TotalRecordAPI = field.NewInt32(tableName, "total_record_api")
 	_polarisTaskRecord.SuccessRecordAPI = field.NewInt32(tableName, "success_record_api")
 	_polarisTaskRecord.FailRecordAPI = field.NewInt32(tableName, "fail_record_api")
+	_polarisTaskRecord.MonitorID = field.NewString(tableName, "monitor_id")
+	_polarisTaskRecord.MonitorName = field.NewString(tableName, "monitor_name")
+	_polarisTaskRecord.MonitorAddr = field.NewString(tableName, "monitor_addr")
 
 	_polarisTaskRecord.fillFieldMap()
 
@@ -99,6 +102,9 @@ type polarisTaskRecord struct {
 	TotalRecordAPI    field.Int32
 	SuccessRecordAPI  field.Int32
 	FailRecordAPI     field.Int32
+	MonitorID         field.String
+	MonitorName       field.String
+	MonitorAddr       field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -146,6 +152,9 @@ func (p *polarisTaskRecord) updateTableName(table string) *polarisTaskRecord {
 	p.TotalRecordAPI = field.NewInt32(table, "total_record_api")
 	p.SuccessRecordAPI = field.NewInt32(table, "success_record_api")
 	p.FailRecordAPI = field.NewInt32(table, "fail_record_api")
+	p.MonitorID = field.NewString(table, "monitor_id")
+	p.MonitorName = field.NewString(table, "monitor_name")
+	p.MonitorAddr = field.NewString(table, "monitor_addr")
 
 	p.fillFieldMap()
 
@@ -174,7 +183,7 @@ func (p *polarisTaskRecord) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (p *polarisTaskRecord) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 31)
+	p.fieldMap = make(map[string]field.Expr, 34)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["status"] = p.Status
@@ -206,6 +215,9 @@ func (p *polarisTaskRecord) fillFieldMap() {
 	p.fieldMap["total_record_api"] = p.TotalRecordAPI
 	p.fieldMap["success_record_api"] = p.SuccessRecordAPI
 	p.fieldMap["fail_record_api"] = p.FailRecordAPI
+	p.fieldMap["monitor_id"] = p.MonitorID
+	p.fieldMap["monitor_name"] = p.MonitorName
+	p.fieldMap["monitor_addr"] = p.MonitorAddr
 }
 
 func (p polarisTaskRecord) clone(db *gorm.DB) polarisTaskRecord {

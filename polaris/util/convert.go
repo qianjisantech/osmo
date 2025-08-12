@@ -275,3 +275,198 @@ func MapToPolarisTrafficPool(data map[string]interface{}) (*model.PolarisTraffic
 	log.Printf("最终转换结果: %+v", trafficPool)
 	return trafficPool, nil
 }
+func MapToPolarisResourceAgent(data map[string]interface{}) (*model.PolarisResourceAgent, error) {
+	agent := &model.PolarisResourceAgent{
+		// 设置默认值
+		Status:                "idle", // 默认空闲状态
+		IsDeleted:             false,
+		CreateTime:            time.Now(),
+		UpdateTime:            time.Now(),
+		CreateBy:              "system",
+		CreateByName:          "system",
+		UpdateBy:              "system",
+		UpdateByName:          "system",
+		IP:                    "127.0.0.1:80", // 默认IP
+		CPUCores:              0,
+		CPUUsedPercent:        0.0,
+		CPUFreePercent:        0.0,
+		MemoryTotal:           0,
+		MemoryUsed:            0,
+		MemoryFree:            0,
+		MemoryUsedPercent:     0.0,
+		NetworkBytesSent:      0,
+		NetworkBytesReceive:   0,
+		NetworkPacketsSent:    0,
+		NetworkPacketsReceive: 0,
+		ExecuteStatus:         "idle",
+	}
+
+	// 辅助函数：安全获取值
+	getValue := func(key string) interface{} {
+		if val, ok := data[key]; ok {
+			return val
+		}
+		return nil
+	}
+
+	// 处理ID字段
+	if idVal := getValue("id"); idVal != nil {
+		switch v := idVal.(type) {
+		case int64:
+			agent.ID = v
+		case float64:
+			agent.ID = int64(v)
+		case string:
+			if id, err := strconv.ParseInt(v, 10, 64); err == nil {
+				agent.ID = id
+			}
+		}
+	}
+
+	// 处理字符串字段
+	stringFields := []struct {
+		key    string
+		target *string
+	}{
+		{"name", agent.Name},
+		{"status", &agent.Status},
+		{"description", agent.Description},
+		{"identification_code", &agent.IdentificationCode},
+		{"host_name", &agent.HostName},
+		{"execute_status", &agent.ExecuteStatus},
+		{"deleted_by", agent.DeletedBy},
+		{"deleted_by_name", agent.DeletedByName},
+	}
+
+	for _, field := range stringFields {
+		if val := getValue(field.key); val != nil {
+			if str, ok := val.(string); ok && str != "" {
+				*field.target = str
+			}
+		}
+	}
+
+	// 处理bool字段
+	if isDeletedVal := getValue("is_deleted"); isDeletedVal != nil {
+		switch v := isDeletedVal.(type) {
+		case bool:
+			agent.IsDeleted = v
+		case int, int64:
+			agent.IsDeleted = v != 0
+		case string:
+			agent.IsDeleted = strings.ToLower(v) == "true" || v == "1"
+		}
+	}
+
+	// 处理时间字段
+	parseTime := func(val interface{}) *time.Time {
+		if val == nil {
+			return nil
+		}
+
+		switch v := val.(type) {
+		case string:
+			if v == "" {
+				return nil
+			}
+			formats := []string{
+				time.RFC3339,
+				"2006-01-02 15:04:05",
+				time.DateTime,
+			}
+			for _, format := range formats {
+				if t, err := time.Parse(format, v); err == nil {
+					return &t // 返回指针
+				}
+			}
+		case time.Time:
+			return &v // 返回指针
+		case float64:
+			// 处理时间戳 - 修正此处
+			t := time.Unix(int64(v), 0)
+			return &t // 返回指针
+		case int64:
+			t := time.Unix(v, 0)
+			return &t // 返回指针
+		}
+		return nil
+	}
+
+	timeFields := []struct {
+		key    string
+		target **time.Time
+	}{
+		{"deleted_time", &agent.DeletedTime},
+		{"last_report_time", &agent.LastReportTime},
+		{"start_time", &agent.StartTime},
+		{"stop_time", &agent.StopTime},
+	}
+
+	for _, field := range timeFields {
+		if val := getValue(field.key); val != nil {
+			if t := parseTime(val); t != nil {
+				*field.target = t
+			}
+		}
+	}
+
+	// 处理数值字段
+	numericFields := []struct {
+		key    string
+		target interface{}
+	}{
+		{"cpu_cores", &agent.CPUCores},
+		{"cpu_used_percent", &agent.CPUUsedPercent},
+		{"cpu_free_percent", &agent.CPUFreePercent},
+		{"memory_total", &agent.MemoryTotal},
+		{"memory_used", &agent.MemoryUsed},
+		{"memory_free", &agent.MemoryFree},
+		{"memory_used_percent", &agent.MemoryUsedPercent},
+		{"network_bytes_sent", &agent.NetworkBytesSent},
+		{"network_bytes_receive", &agent.NetworkBytesReceive},
+		{"network_packets_sent", &agent.NetworkPacketsSent},
+		{"network_packets_receive", &agent.NetworkPacketsReceive},
+	}
+
+	for _, field := range numericFields {
+		if val := getValue(field.key); val != nil {
+			switch ptr := field.target.(type) {
+			case *int32:
+				switch v := val.(type) {
+				case int64:
+					*ptr = int32(v)
+				case float64:
+					*ptr = int32(v)
+				case string:
+					if i, err := strconv.ParseInt(v, 10, 32); err == nil {
+						*ptr = int32(i)
+					}
+				}
+			case *int64:
+				switch v := val.(type) {
+				case int64:
+					*ptr = v
+				case float64:
+					*ptr = int64(v)
+				case string:
+					if i, err := strconv.ParseInt(v, 10, 64); err == nil {
+						*ptr = i
+					}
+				}
+			case *float64:
+				switch v := val.(type) {
+				case float64:
+					*ptr = v
+				case int64:
+					*ptr = float64(v)
+				case string:
+					if f, err := strconv.ParseFloat(v, 64); err == nil {
+						*ptr = f
+					}
+				}
+			}
+		}
+	}
+
+	return agent, nil
+}

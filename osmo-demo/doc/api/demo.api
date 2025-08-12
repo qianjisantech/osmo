@@ -1,0 +1,11 @@
+import "discovery/discovery.api"
+
+info
+(
+	title:   "polaris"
+	desc:    "polaris"
+	author:  "philip.shen"
+	email:   "philip.shen@jtexpress.com"
+	version: "0.0.1"
+)
+

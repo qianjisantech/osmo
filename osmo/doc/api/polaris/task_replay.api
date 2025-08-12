@@ -1,0 +1,129 @@
+syntax = "v1"
+
+info(
+    title: "osmo后端"
+    desc: "osmo后端"
+    author: "philip.shen"
+    email: "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+type (
+    //  TaskReplayQueryPageReq 回放任务分页查询入参
+    TaskReplayQueryPageReq {
+        PageSize int `json:"page_size"`            //页最大数量
+        Page int `json:"page"`                     //当前页
+        Keyword string `json:"keyword"`            // 关键字
+        Status string `json:"status,optional"`
+        ReplayTimeRange []string `json:"replay_time_range,optional"` // 创建时间范围
+    }
+        //  TaskReplayQueryPageResp 回放任务分页查询返回体
+    TaskReplayQueryPageResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data TaskReplayQueryPageRespData `json:"data"`
+    }
+        // TaskReplayQueryPageRespReplay 回放任务Replay信息
+    TaskReplayQueryPageRespRecord {
+        Id string `json:"id"`                              // 回放任务Id
+        Name string `json:"name"`                          // 回放任务名称
+        Status string `json:"status"`
+        ReplayTime string `json:"replay_time"`
+        ReplayAddr string `json:"replay_addr"`
+        ExecuteTime string `json:"execute_time"`
+        FailReason string `json:"fail_reason"`
+
+    }
+        // TaskReplayQueryPageRespData 查询返回数据
+    TaskReplayQueryPageRespData {
+        Total int `json:"total"`                                  // 总数
+        Records []TaskReplayQueryPageRespRecord `json:"records"`  // 记录列表
+    }
+    TaskReplayCreateReq {
+
+        Name string `json:"name"`                                   // 回放任务名称
+        Description string `json:"description,optional"`            // 描述信息
+
+        ReplayAddr string  `json:"replay_addr"`
+        ReplayTime string `json:"replay_time"`
+        NeedReplayTraffics []string `json:"need_replay_traffics"`
+    }
+    TaskReplayCreateReqStrategy {
+        Id string `json:"id"`
+        Name string `json:"name"`
+        Value string `json:"value"`
+    }
+    TaskReplayCreateReqAgent {
+        Id string `json:"id"`
+        Key string `json:"key"`
+        Value string `json:"value"`
+        ExecuteStatus string `json:"execute_status"`
+    }
+    TaskReplayCreateResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+
+    TaskReplayUpdateReq {
+        Id string `json:"id"`
+        Name string `json:"name"`                                   // 回放任务名称
+        Description string `json:"description,optional"`            // 描述信息
+        StrategyId string `json:"strategy_id"`                      // 回放策略id
+        StrategyName string `json:"strategy_name"`                  // 回放策略名称
+        AgentId  string  `json:"agent_id"`
+        AgentName string `json:"agent_name"`
+    }
+    TaskReplayUpdateResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+    TaskReplayDetailReq {
+        ID string `path:"id"`  // 关键点：path 标签表示路径参数
+    }
+    TaskReplayDetailResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data TaskReplayDetailRespData `json:"data" `
+    }
+    TaskReplayDetailRespData {
+        ID string `json:"id"`                              // 回放任务ID
+        Name string `json:"name"`                          // 回放任务名称
+        Description string `json:"description"`            // 描述信息
+        Status string `json:"status"`
+        ReplayTime string `json:"replay_time"`
+        ReplayAddr string `json:"replay_addr"`
+        TaskReplayDetailRespDataTraffics []TaskReplayDetailRespDataTraffic `json:"traffics"`
+    }
+    TaskReplayDetailRespDataTraffic{
+        ID string `json:"id"`
+        Url string `json:"url"`
+        Method string `json:"method"`
+    }
+    TaskReplayExecuteReq {
+        ID string `path:"id"`
+    }
+    TaskReplayExecuteResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+    }
+)
+
+@server(
+    group: polaris/task
+    prefix: /api/polaris/task/replay
+)
+service osmo-api {
+    // 回放任务分页查询
+    @handler TaskReplayQueryPage
+    post /page (TaskReplayQueryPageReq) returns (TaskReplayQueryPageResp)
+    // 创建回放任务
+    @handler TaskReplayCreate
+    post /create (TaskReplayCreateReq) returns (TaskReplayCreateResp)
+    // 更新回放任务
+    @handler TaskReplayUpdate
+    post /update (TaskReplayUpdateReq) returns (TaskReplayUpdateResp)
+    // 回放任务编辑页详情
+    @handler TaskReplayDetail
+    get /detail/:id (TaskReplayDetailReq) returns (TaskReplayDetailResp)
+    @handler  TaskReplayExecute
+    get /execute/:id (TaskReplayExecuteReq) returns (TaskReplayExecuteResp)
+}

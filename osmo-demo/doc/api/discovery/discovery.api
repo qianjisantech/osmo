@@ -1,0 +1,51 @@
+syntax = "v1"
+
+info
+(
+    title:   "discovery模块"
+    desc:    "discovery模块接口定义"
+    author:  "philip.shen"
+    email:   "philip.shen@jtexpress.com"
+    version: "0.0.1"
+)
+
+type (
+    AuthLoginReq {
+        Username string `json:"username"`
+        Password string `json:"password"`
+    }
+    AuthLoginResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data AuthLoginRespData `json:"data"`
+    }
+    AuthLoginRespData {
+    Id string   `json:"id"`
+    Token string `json:"token"`
+    }
+    AuthRegisterReq {
+        Username string `json:"username"`
+        Password string `json:"password"`
+        Code string `json:"code"`
+    }
+    AuthRegisterResp {
+        Success bool `json:"success"`
+        Message string `json:"message"`
+        Data AuthRegisterRespData `json:"data"`
+    }
+    AuthRegisterRespData {
+        Id string   `json:"id"`
+        Token string `json:"token"`
+    }
+
+)
+@server(
+    group: demo
+    prefix: /demo/auth
+)
+service demo-api {
+    @handler AuthLogin
+    post /login (AuthLoginReq) returns (AuthLoginResp)
+    @handler AuthRegister
+    post /register (AuthRegisterReq) returns (AuthRegisterResp)
+}

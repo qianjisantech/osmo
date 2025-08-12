@@ -44,6 +44,9 @@ func (l *TaskRecordCreateLogic) TaskRecordCreate(req *types.TaskRecordCreateReq)
 	if req.Agent == nil {
 		return nil, errorx.NewDefaultError("录制任务需要关联执行机")
 	}
+	if req.Monitor == nil {
+		return nil, errorx.NewDefaultError("录制任务监控中心不能为空")
+	}
 	if req.RecordTime == nil || len(req.RecordTime) == 0 {
 		return nil, errorx.NewDefaultError("录制时间不能为空")
 	}
@@ -81,6 +84,9 @@ func (l *TaskRecordCreateLogic) TaskRecordCreate(req *types.TaskRecordCreateReq)
 		MonitorCenterID:   monitorCenterID,
 		MonitorCenterName: monitorCenterName,
 		ExecuteTime:       &executeTime,
+		MonitorAddr:       req.Monitor.Addr,
+		MonitorID:         req.Monitor.Id,
+		MonitorName:       req.Monitor.Name,
 	}
 	if len(req.RecordTime) == 2 {
 		startTime, err := time.Parse(time.DateTime, req.RecordTime[0])

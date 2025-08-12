@@ -7,13 +7,13 @@ import { computed, onMounted, reactive, ref } from 'vue';
 
 import {
   CaretRight,
-  Delete,
-  Edit,
+  Plus,
   Refresh,
   Search,
   View,
 } from '@element-plus/icons-vue';
 import dayjs from 'dayjs'; // 推荐使用 dayjs 处理日期
+import { ElMessage } from 'element-plus';
 import {
   ElButton,
   ElCard,
@@ -34,15 +34,22 @@ import {
 } from 'element-plus';
 
 import { useTrafficPoolStore } from '#/store';
+import { useTaskReplayStore } from '#/store/polaris/task/replay';
 
+import CreateReplayTaskDialog from './components/CreateReplayTaskDialog.vue';
 import TrafficDetailDialog from './components/TrafficDetailDialog.vue';
 
+const taskReplayStore = useTaskReplayStore();
 const activeNames = ref(['1']);
 const handleChange = (val: CollapseModelValue) => {
   console.log(val);
 };
-const page = ref(1);
-const page_size = ref(10);
+const pagination = reactive({
+  current_page: 1,
+  page_size: 20,
+  total: computed(() => trafficPoolStore.trafficPoolQueryPageResult.total),
+});
+
 // 计算默认日期范围
 const getDefaultDateRange = () => {
   const now = dayjs();
@@ -53,19 +60,12 @@ const getDefaultDateRange = () => {
 };
 // 查询条件
 const filterForm = reactive({
+  id: '',
   keyword: '',
   method: 'all',
   record_time_range: [] as string[], // 明确类型为字符串数组
-  page: page.value,
-  page_size: page_size.value,
-});
-// 组件挂载时设置默认日期范围
-
-// 分页
-const pagination = ref({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
+  page: pagination.current_page,
+  page_size: pagination.page_size,
 });
 const trafficPoolStore = useTrafficPoolStore();
 
@@ -73,6 +73,7 @@ const trafficPoolStore = useTrafficPoolStore();
 const pools = computed(
   () => trafficPoolStore.trafficPoolQueryPageResult.records,
 );
+
 // 详情对话框状态
 const detailDialogVisible = ref(false);
 const currentPool = ref<any>(null);
@@ -94,7 +95,6 @@ const handleSearch = async () => {
     };
 
     await trafficPoolStore.queryPage(requestParams);
-    page.value = 1;
   } catch (error) {
     console.error('加载流量列表失败:', error);
   } finally {
@@ -102,17 +102,68 @@ const handleSearch = async () => {
   }
 };
 
-const handleReset = () => {};
-
-const handleSizeChange = (val: number) => {
-  pagination.value.pageSize = val;
+const handleReset = () => {
+  filterForm.keyword = '';
+  filterForm.method = 'all';
+  filterForm.record_time_range = getDefaultDateRange();
+  filterForm.page = 1;
+  filterForm.page_size = 20;
+  handleSearch();
 };
 
-const handleCurrentChange = (val: number) => {
-  pagination.value.currentPage = val;
+const handleSizeChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page_size = val;
+    filterForm.page = 1; // 重置到第一页
+    pagination.current_page = 1;
+    await handleSearch();
+  } catch (error) {
+    console.error('切换分页大小失败:', error);
+  } finally {
+    loading.value = false;
+  }
 };
-const handleEdit = (id: string) => {
-  console.log(id);
+
+const handleCurrentChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page = val;
+    await handleSearch();
+  } catch (error) {
+    console.error('切换当前页失败:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+const selected_pools = ref<TrafficPoolNamespace.TrafficPool[]>([]);
+
+// 计算属性：判断是否有选中项
+const hasSelection = computed(() => selected_pools.value.length > 0);
+// 处理选择变化
+const handleSelectionChange = (val: TrafficPoolNamespace.TrafficPool[]) => {
+  selected_pools.value = val;
+  console.log('选中项:', val);
+  console.log('v:', hasSelection.value);
+};
+
+const createTaskDialogVisible = ref(false);
+const handleCreateReplayTask = () => {
+  createTaskDialogVisible.value = true;
+};
+// 处理提交创建任务
+const handleSubmitCreateTask = async (formData: any) => {
+  try {
+    loading.value = true;
+    console.log('提交创建任务:', formData);
+    await taskReplayStore.createFunc(formData);
+    createTaskDialogVisible.value = false;
+  } catch (error) {
+    console.error('创建任务失败:', error);
+    ElMessage.error('创建任务失败');
+  } finally {
+    loading.value = false;
+  }
 };
 // 组件挂载时加载数据
 onMounted(() => {
@@ -135,15 +186,33 @@ onMounted(() => {
             <ElIcon class="mr-1"><Refresh /></ElIcon>
             重置
           </ElButton>
+          <ElButton
+            :disabled="!hasSelection"
+            type="success"
+            @click="handleCreateReplayTask"
+          >
+            <ElIcon class="mr-1"><Plus /></ElIcon>
+            创建回放任务
+          </ElButton>
         </div>
       </div>
 
       <ElCollapse v-model="activeNames" @change="handleChange">
         <ElCollapseItem name="1" :icon="CaretRight">
           <ElForm label-width="80px" class="filter-form">
-            <ElRow :gutter="16" class="filter-row">
+            <ElRow :gutter="8" class="filter-row">
+              <ElCol :span="4">
+                <ElFormItem label="编号" class="filter-item">
+                  <ElInput
+                    v-model="filterForm.id"
+                    placeholder="请输入编号"
+                    clearable
+                    style="width: 300px"
+                  />
+                </ElFormItem>
+              </ElCol>
               <!-- 关键字 -->
-              <ElCol :span="6">
+              <ElCol :span="4">
                 <ElFormItem label="地址" class="filter-item">
                   <ElInput
                     v-model="filterForm.keyword"
@@ -155,7 +224,7 @@ onMounted(() => {
               </ElCol>
 
               <!-- 请求方式 -->
-              <ElCol :span="8">
+              <ElCol :span="4">
                 <ElFormItem label="请求方式" class="filter-item">
                   <ElSelect
                     v-model="filterForm.method"
@@ -173,7 +242,7 @@ onMounted(() => {
               </ElCol>
 
               <!-- 录制时间 -->
-              <ElCol :span="8">
+              <ElCol :span="4">
                 <ElFormItem label="录制时间" width="100" class="filter-item">
                   <ElDatePicker
                     v-model="filterForm.record_time_range"
@@ -187,6 +256,7 @@ onMounted(() => {
                     ]"
                     value-format="YYYY-MM-DD HH:mm:ss"
                     class="w-full"
+                    :clearable="false"
                   />
                 </ElFormItem>
               </ElCol>
@@ -195,8 +265,14 @@ onMounted(() => {
         </ElCollapseItem>
       </ElCollapse>
       <div>
-        <ElTable :data="pools" style="width: 100%">
-          <ElTableColumn prop="id" label="序号" width="200" />
+        <ElTable
+          :data="pools"
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+        >
+          <ElTableColumn type="selection" width="55" />
+          <ElTableColumn type="index" width="50" />
+          <ElTableColumn prop="id" label="编号" width="200" />
           <ElTableColumn prop="url" label="地址" width="700" />
           <ElTableColumn prop="method" label="请求方式" />
           <ElTableColumn prop="record_task_name" label="录制任务名称" />
@@ -207,12 +283,6 @@ onMounted(() => {
                 <ElButton type="primary" size="small" @click="showDetail(row)">
                   <ElIcon><View /></ElIcon>
                 </ElButton>
-                <ElButton type="warning" size="small">
-                  <ElIcon><Edit @click="handleEdit(row.id)" /></ElIcon>
-                </ElButton>
-                <ElButton type="danger" size="small">
-                  <ElIcon><Delete /></ElIcon>
-                </ElButton>
               </div>
             </template>
           </ElTableColumn>
@@ -220,19 +290,24 @@ onMounted(() => {
 
         <ElPagination
           class="mt-4"
-          v-model:current-page="pagination.currentPage"
-          v-model:page-size="pagination.pageSize"
-          :page-sizes="[10, 20, 30, 50]"
+          v-model:current-page="pagination.current_page"
+          v-model:page-size="pagination.page_size"
+          :page-sizes="[20, 50, 100, 500, 1000]"
           :small="false"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="pools.length"
+          :total="pagination.total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
       </div>
     </ElCard>
     <!-- 详情弹窗 -->
-
+    <!-- 新增弹窗组件 -->
+    <CreateReplayTaskDialog
+      v-model="createTaskDialogVisible"
+      :selected-pools="selected_pools"
+      @submit="handleSubmitCreateTask"
+    />
     <TrafficDetailDialog
       v-model="detailDialogVisible"
       :detail-data="currentPool"

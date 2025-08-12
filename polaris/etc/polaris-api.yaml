@@ -23,6 +23,8 @@ Mysql:
       Fields: ["status"]
     - Name: "polaris_traffic_pool"
       Fields: ["completed_flag"]
+    - Name: "polaris_resource_agent"
+      Fields: [ "status","execute_status"]
 
 Kafka:
   Brokers:

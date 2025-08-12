@@ -31,7 +31,7 @@ func (l *ResourceAgentSelectOptionsLogic) ResourceAgentSelectOptions(req *types.
 
 	// 构建基础查询条件
 	queryBuilder := q.WithContext(l.ctx).Debug().
-		Where(q.IsDeleted.Is(false)).Where(q.Name.IsNotNull())
+		Where(q.IsDeleted.Is(false))
 	if len(req.Status) > 0 {
 		queryBuilder = queryBuilder.
 			Where(q.Status.In(req.Status...))
@@ -52,12 +52,20 @@ func (l *ResourceAgentSelectOptionsLogic) ResourceAgentSelectOptions(req *types.
 		logx.Errorf("查询执行机失败: %v", err)
 		return nil, errorx.NewDefaultError("查询执行机失败")
 	}
+	{
 
+	}
 	// 转换为前端下拉框需要的格式
 	options := make([]types.ResourceAgentSelectOptionsRespData, 0, len(agents))
 	for _, agent := range agents {
+		var name string
+		if agent.Name != nil {
+			name = *agent.Name
+		} else {
+			name = agent.HostName
+		}
 		options = append(options, types.ResourceAgentSelectOptionsRespData{
-			Key:           *agent.Name,
+			Key:           name,
 			Value:         agent.IP,
 			Id:            strconv.FormatInt(agent.ID, 10),
 			ExecuteStatus: agent.ExecuteStatus,

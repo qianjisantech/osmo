@@ -104,6 +104,37 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/create",
+				Handler: polaristask.TaskReplayCreateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/detail/:id",
+				Handler: polaristask.TaskReplayDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/execute/:id",
+				Handler: polaristask.TaskReplayExecuteHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/page",
+				Handler: polaristask.TaskReplayQueryPageHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/update",
+				Handler: polaristask.TaskReplayUpdateHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/polaris/task/replay"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/create",
 				Handler: polaristask.TaskRecordCreateHandler(serverCtx),
 			},
 			{

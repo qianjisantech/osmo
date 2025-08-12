@@ -10,6 +10,7 @@ const (
 	AgentStatusOffline  AgentStatus = "offline"  // 离线
 	AgentStatusError    AgentStatus = "error"    // 错误
 	AgentStatusWarning  AgentStatus = "warning"  // 警告
+	AgentStatusHealthy  AgentStatus = "healthy"  // 健康
 )
 const (
 	AgentExecuteStatusFree AgentExecuteStatus = "free" // 空闲

@@ -42,10 +42,20 @@ func newPolarisTaskReplay(db *gorm.DB, opts ...gen.DOOption) polarisTaskReplay {
 	_polarisTaskReplay.UpdateByName = field.NewString(tableName, "update_by_name")
 	_polarisTaskReplay.RuleID = field.NewInt64(tableName, "rule_id")
 	_polarisTaskReplay.RuleName = field.NewString(tableName, "rule_name")
-	_polarisTaskReplay.StrategyID = field.NewInt64(tableName, "strategy_id")
+	_polarisTaskReplay.StrategyCode = field.NewString(tableName, "strategy_code")
 	_polarisTaskReplay.StrategyName = field.NewString(tableName, "strategy_name")
-	_polarisTaskReplay.AgentID = field.NewInt64(tableName, "agent_id")
-	_polarisTaskReplay.AgentName = field.NewString(tableName, "agent_name")
+	_polarisTaskReplay.ReplayTime = field.NewTime(tableName, "replay_time")
+	_polarisTaskReplay.Description = field.NewString(tableName, "description")
+	_polarisTaskReplay.ExecuteTime = field.NewTime(tableName, "execute_time")
+	_polarisTaskReplay.MonitorCenterID = field.NewString(tableName, "monitor_center_id")
+	_polarisTaskReplay.MonitorCenterName = field.NewString(tableName, "monitor_center_name")
+	_polarisTaskReplay.MonitorCenterURL = field.NewString(tableName, "monitor_center_url")
+	_polarisTaskReplay.FailReason = field.NewString(tableName, "fail_reason")
+	_polarisTaskReplay.TotalReplayAPI = field.NewInt32(tableName, "total_replay_api")
+	_polarisTaskReplay.SuccessReplayAPI = field.NewInt32(tableName, "success_replay_api")
+	_polarisTaskReplay.FailReplayAPI = field.NewInt32(tableName, "fail_replay_api")
+	_polarisTaskReplay.NeedReplayTraffics = field.NewString(tableName, "need_replay_traffics")
+	_polarisTaskReplay.ReplayAddr = field.NewString(tableName, "replay_addr")
 
 	_polarisTaskReplay.fillFieldMap()
 
@@ -55,26 +65,36 @@ func newPolarisTaskReplay(db *gorm.DB, opts ...gen.DOOption) polarisTaskReplay {
 type polarisTaskReplay struct {
 	polarisTaskReplayDo polarisTaskReplayDo
 
-	ALL           field.Asterisk
-	ID            field.Int64
-	Name          field.String
-	Status        field.String // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
-	IsDeleted     field.Bool   // 逻辑删除标识（0 未删除；1 已删除）
-	DeletedTime   field.Time
-	DeletedBy     field.String
-	DeletedByName field.String
-	CreateTime    field.Time
-	CreateBy      field.String
-	CreateByName  field.String
-	UpdateTime    field.Time
-	UpdateBy      field.String
-	UpdateByName  field.String
-	RuleID        field.Int64  // 规则id
-	RuleName      field.String // 规则名称
-	StrategyID    field.Int64  // 策略id
-	StrategyName  field.String // 策略名称
-	AgentID       field.Int64
-	AgentName     field.String
+	ALL                field.Asterisk
+	ID                 field.Int64
+	Name               field.String
+	Status             field.String // 任务状态(pending 待定 running 进行中 success 运行成功 failed 运行失败 canceled 已取消 timeout 超时  skipped 跳过 aborted 中止 waiting 等待 paused 暂停）
+	IsDeleted          field.Bool   // 逻辑删除标识（0 未删除；1 已删除）
+	DeletedTime        field.Time
+	DeletedBy          field.String
+	DeletedByName      field.String
+	CreateTime         field.Time
+	CreateBy           field.String
+	CreateByName       field.String
+	UpdateTime         field.Time
+	UpdateBy           field.String
+	UpdateByName       field.String
+	RuleID             field.Int64  // 规则id
+	RuleName           field.String // 规则名称
+	StrategyCode       field.String
+	StrategyName       field.String // 策略名称
+	ReplayTime         field.Time
+	Description        field.String // 描述
+	ExecuteTime        field.Time
+	MonitorCenterID    field.String
+	MonitorCenterName  field.String
+	MonitorCenterURL   field.String
+	FailReason         field.String
+	TotalReplayAPI     field.Int32
+	SuccessReplayAPI   field.Int32
+	FailReplayAPI      field.Int32
+	NeedReplayTraffics field.String
+	ReplayAddr         field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -106,10 +126,20 @@ func (p *polarisTaskReplay) updateTableName(table string) *polarisTaskReplay {
 	p.UpdateByName = field.NewString(table, "update_by_name")
 	p.RuleID = field.NewInt64(table, "rule_id")
 	p.RuleName = field.NewString(table, "rule_name")
-	p.StrategyID = field.NewInt64(table, "strategy_id")
+	p.StrategyCode = field.NewString(table, "strategy_code")
 	p.StrategyName = field.NewString(table, "strategy_name")
-	p.AgentID = field.NewInt64(table, "agent_id")
-	p.AgentName = field.NewString(table, "agent_name")
+	p.ReplayTime = field.NewTime(table, "replay_time")
+	p.Description = field.NewString(table, "description")
+	p.ExecuteTime = field.NewTime(table, "execute_time")
+	p.MonitorCenterID = field.NewString(table, "monitor_center_id")
+	p.MonitorCenterName = field.NewString(table, "monitor_center_name")
+	p.MonitorCenterURL = field.NewString(table, "monitor_center_url")
+	p.FailReason = field.NewString(table, "fail_reason")
+	p.TotalReplayAPI = field.NewInt32(table, "total_replay_api")
+	p.SuccessReplayAPI = field.NewInt32(table, "success_replay_api")
+	p.FailReplayAPI = field.NewInt32(table, "fail_replay_api")
+	p.NeedReplayTraffics = field.NewString(table, "need_replay_traffics")
+	p.ReplayAddr = field.NewString(table, "replay_addr")
 
 	p.fillFieldMap()
 
@@ -138,7 +168,7 @@ func (p *polarisTaskReplay) GetFieldByName(fieldName string) (field.OrderExpr, b
 }
 
 func (p *polarisTaskReplay) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 19)
+	p.fieldMap = make(map[string]field.Expr, 29)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["name"] = p.Name
 	p.fieldMap["status"] = p.Status
@@ -154,10 +184,20 @@ func (p *polarisTaskReplay) fillFieldMap() {
 	p.fieldMap["update_by_name"] = p.UpdateByName
 	p.fieldMap["rule_id"] = p.RuleID
 	p.fieldMap["rule_name"] = p.RuleName
-	p.fieldMap["strategy_id"] = p.StrategyID
+	p.fieldMap["strategy_code"] = p.StrategyCode
 	p.fieldMap["strategy_name"] = p.StrategyName
-	p.fieldMap["agent_id"] = p.AgentID
-	p.fieldMap["agent_name"] = p.AgentName
+	p.fieldMap["replay_time"] = p.ReplayTime
+	p.fieldMap["description"] = p.Description
+	p.fieldMap["execute_time"] = p.ExecuteTime
+	p.fieldMap["monitor_center_id"] = p.MonitorCenterID
+	p.fieldMap["monitor_center_name"] = p.MonitorCenterName
+	p.fieldMap["monitor_center_url"] = p.MonitorCenterURL
+	p.fieldMap["fail_reason"] = p.FailReason
+	p.fieldMap["total_replay_api"] = p.TotalReplayAPI
+	p.fieldMap["success_replay_api"] = p.SuccessReplayAPI
+	p.fieldMap["fail_replay_api"] = p.FailReplayAPI
+	p.fieldMap["need_replay_traffics"] = p.NeedReplayTraffics
+	p.fieldMap["replay_addr"] = p.ReplayAddr
 }
 
 func (p polarisTaskReplay) clone(db *gorm.DB) polarisTaskReplay {

@@ -1,194 +1,195 @@
 <script lang="ts" setup>
+import type { TaskReplayNameSpace } from '#/types/task/replay';
+import type { TrafficPoolNamespace } from '#/types/traffic/pool';
+
 import { computed, onMounted, reactive, ref } from 'vue';
-import {
-  Delete,
-  Document,
-  Edit,
-  Plus,
-  Refresh,
-  Search,
-  View,
-} from '@element-plus/icons-vue';
+
+import { Document, Plus, Refresh, Search } from '@element-plus/icons-vue';
 import {
   ElButton,
   ElCard,
   ElCollapse,
   ElCollapseItem,
-  ElDatePicker,
-  ElDialog,
-  ElForm,
-  ElFormItem,
   ElIcon,
   ElInput,
+  ElMessage,
   ElOption,
   ElPagination,
   ElSelect,
   ElTable,
   ElTableColumn,
   ElTag,
+  ElText,
 } from 'element-plus';
 
-// 类型定义
-interface Task {
-  id: number;
-  name: string;
-  strategy: string;
-  rule: string;
-  createTime: string;
-  creator: string;
-  updater: string;
-  updateTime: string;
-}
+import { useTaskRecordStore } from '#/store/polaris/task/record';
+import { useTaskReplayStore } from '#/store/polaris/task/replay';
 
-// 模拟数据
-const mockData: Task[] = [
-  {
-    id: 1,
-    name: '用户服务全量回放',
-    strategy: 'full',
-    rule: '用户查询规则集',
-    createTime: '2023-08-15 09:30:25',
-    creator: '张三',
-    updater: '李四',
-    updateTime: '2023-08-16 14:20:10',
-  },
-  // 其他数据...
-];
+import ExecuteConfirmDialog from './components/ExecuteConfirmDialog.vue';
+import ReplayTaskDialog from './components/ReplayTaskDialog.vue';
 
+const currentTaskId = ref('');
+const loading = ref(false);
+const taskRecordStore = useTaskRecordStore();
+const taskReplayStore = useTaskReplayStore();
+// 添加确认弹窗状态
+const confirmDialog = reactive({
+  visible: false,
+  currentTask: null as null | TaskReplayNameSpace.TaskReplay,
+});
 // 状态管理
 const activeCollapse = ref(['1']);
-const queryParams = reactive({
-  name: '',
-  strategy: '',
-  dateRange: [] as string[],
-});
-
 const pagination = reactive({
-  currentPage: 1,
-  pageSize: 10,
-  total: mockData.length,
+  current_page: 1,
+  page_size: 10,
+  total: computed(() => taskReplayStore.taskReplayQueryPageResult.total),
 });
 
-const tableData = computed(() => {
-  const start = (pagination.currentPage - 1) * pagination.pageSize;
-  const end = start + pagination.pageSize;
-  return filteredData.value.slice(start, end);
+// 筛选表单
+const filterForm: TaskReplayNameSpace.TaskReplayQueryPageParams = reactive({
+  page: pagination.current_page,
+  page_size: pagination.page_size,
+  keyword: '',
+  replay_time_range: [],
+  status: 'all',
 });
-
-const filteredData = ref<Task[]>(mockData);
-
-// 详情弹窗
-const detailDialogVisible = ref(false);
-const currentTask = ref<null | Task>(null);
-
-// 任务表单弹窗
-const taskDialogVisible = ref(false);
-const isEditMode = ref(false);
-const taskForm = reactive({
-  id: 0,
-  name: '',
-  strategy: '',
-  rule: '',
+const taskReplays = computed(
+  () => taskReplayStore.taskReplayQueryPageResult.records || [],
+);
+const paginated_task_replays = computed(() => {
+  const start = (pagination.current_page - 1) * pagination.page_size;
+  const end = start + pagination.page_size;
+  return taskReplays.value.slice(start, end);
 });
+// 修改后的刷新数据方法
+const handleQueryPage = async () => {
+  const { status, ...rest } = filterForm;
+  const requestParams = {
+    ...rest,
+    ...(status !== 'all' && { status }),
+  };
+  await taskReplayStore.queryPage(requestParams);
+};
+const getTaskStatusText = (status: string): string => {
+  const map: Record<'default' | TaskReplayNameSpace.TaskStatus, string> = {
+    pending: '待执行',
+    running: '运行中',
+    success: '成功',
+    failed: '失败',
+    canceled: '已取消',
+    timeout: '超时',
+    skipped: '跳过',
+    aborted: '中止',
+    waiting: '等待',
+    paused: '暂停',
+    default: '未知状态',
+  };
 
-// 方法定义
-const searchTasks = () => {
-  filteredData.value = mockData.filter(item =>
-    item.name.includes(queryParams.name) &&
-    (queryParams.strategy === '' || item.strategy === queryParams.strategy)
-  );
-  pagination.total = filteredData.value.length;
+  return map[status as TaskReplayNameSpace.TaskStatus] ?? map.default;
+};
+const getTaskStatusType = (status: string): TaskReplayNameSpace.ElTagType => {
+  const typeMap: Record<string, TaskReplayNameSpace.ElTagType> = {
+    running: 'success',
+    success: 'success',
+    failed: 'danger',
+    timeout: 'danger',
+    aborted: 'danger',
+    canceled: 'warning',
+    waiting: 'warning',
+    paused: 'warning',
+    pending: 'info',
+    skipped: 'info',
+  };
+  return typeMap[status as TaskReplayNameSpace.TaskStatus] || 'info';
 };
 
-const resetQuery = () => {
-  queryParams.name = '';
-  queryParams.strategy = '';
-  queryParams.dateRange = [];
-  searchTasks();
-};
+// 表单数据
 
-const showDetail = (id: number) => {
-  currentTask.value = mockData.find((task) => task.id === id) || null;
-  detailDialogVisible.value = true;
+// 修改 handleExecute 方法
+const handleExecute = (task: TaskReplayNameSpace.TaskReplay) => {
+  confirmDialog.currentTask = task;
+  confirmDialog.visible = true;
 };
-
-const showAddTaskDialog = () => {
-  isEditMode.value = false;
-  Object.assign(taskForm, {
-    id: 0,
-    name: '',
-    strategy: '',
-    rule: '',
-  });
-  taskDialogVisible.value = true;
-};
-
-const editTask = (id: number) => {
-  const task = mockData.find((task) => task.id === id);
-  if (task) {
-    isEditMode.value = true;
-    Object.assign(taskForm, {
-      id: task.id,
-      name: task.name,
-      strategy: task.strategy,
-      rule: task.rule,
-    });
-    taskDialogVisible.value = true;
-  }
-};
-
-const deleteTask = (id: number) => {
-  // 实际项目中这里应该是API调用
-  const index = mockData.findIndex(task => task.id === id);
-  if (index !== -1) {
-    mockData.splice(index, 1);
-    searchTasks();
-  }
-};
-
-const saveTask = () => {
-  // 实际项目中这里应该是API调用
-  if (isEditMode.value) {
-    const index = mockData.findIndex(task => task.id === taskForm.id);
-    if (index !== -1) {
-      Object.assign(mockData[index], {
-        name: taskForm.name,
-        strategy: taskForm.strategy,
-        rule: taskForm.rule,
-        updateTime: new Date().toLocaleString(),
-        updater: '当前用户'
-      });
+// 添加确认执行方法
+const confirmExecute = async () => {
+  if (!confirmDialog.currentTask) return;
+  try {
+    // 这里添加实际执行任务的逻辑
+    await taskReplayStore.executeFunc(confirmDialog.currentTask.id);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      ElMessage.error(error.message);
+    } else {
+      ElMessage.error('发生未知错误');
+      console.error('非Error类型的错误:', error);
     }
-  } else {
-    const newId = Math.max(...mockData.map(task => task.id)) + 1;
-    mockData.unshift({
-      id: newId,
-      name: taskForm.name,
-      strategy: taskForm.strategy,
-      rule: taskForm.rule,
-      createTime: new Date().toLocaleString(),
-      creator: '当前用户',
-      updater: '当前用户',
-      updateTime: new Date().toLocaleString()
-    });
+  } finally {
+    confirmDialog.visible = false;
+    confirmDialog.currentTask = null;
+    await handleQueryPage();
   }
-  taskDialogVisible.value = false;
-  searchTasks();
+};
+const handleSizeChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page_size = val;
+    filterForm.page = 1; // 重置到第一页
+    pagination.current_page = 1;
+    await handleQueryPage();
+  } catch (error) {
+    console.error('切换分页大小失败:', error);
+  } finally {
+    loading.value = false;
+  }
 };
 
-const handleSizeChange = (size: number) => {
-  pagination.pageSize = size;
-  pagination.currentPage = 1;
+const handleCurrentChange = async (val: number) => {
+  try {
+    loading.value = true;
+    filterForm.page = val;
+    await handleQueryPage();
+  } catch (error) {
+    console.error('切换当前页失败:', error);
+  } finally {
+    loading.value = false;
+  }
 };
-
-const handleCurrentChange = (page: number) => {
-  pagination.currentPage = page;
+const handleReset = () => {
+  filterForm.keyword = '';
+  filterForm.status = 'all';
+  filterForm.page = 1;
+  filterForm.page_size = 20;
+  handleQueryPage();
 };
-
-// 初始化
+// 正确 - 使用字面量
+const mode = ref<'create' | 'view'>('create');
+const replayTaskDialogVisible = ref(false);
+const handleReplayTaskDetail = (id: string) => {
+  mode.value = 'view';
+  currentTaskId.value = id;
+  replayTaskDialogVisible.value = true;
+};
+const handleSubmitTask = async (formData: any) => {
+  try {
+    loading.value = true;
+    await taskReplayStore.createFunc(formData);
+    replayTaskDialogVisible.value = false;
+  } catch (error) {
+    console.error('创建任务失败:', error);
+    ElMessage.error('创建任务失败');
+  } finally {
+    loading.value = false;
+  }
+};
+const selected_pools = ref<TrafficPoolNamespace.TrafficPool[]>([]);
+const handleCreateTask = () => {
+  mode.value = 'create';
+  currentTaskId.value = '';
+  replayTaskDialogVisible.value = true;
+};
+// 组件挂载时加载数据
 onMounted(() => {
-  filteredData.value = mockData;
-  pagination.total = mockData.length;
+  handleQueryPage();
 });
 </script>
 
@@ -196,34 +197,30 @@ onMounted(() => {
   <div class="container">
     <!-- 查询区域 -->
     <ElCard class="query-card">
-      <!-- 操作按钮 -->
-      <div class="action-bar">
-        <ElButton type="primary" @click="showAddTaskDialog">
-          <ElIcon class="mr-1"><Plus /></ElIcon>
-          新增任务
-        </ElButton>
-      </div>
-
       <div class="query-bar">
         <div class="query-actions">
-          <ElButton @click="resetQuery">
-            <ElIcon class="mr-1"><Refresh /></ElIcon>
-            重置
-          </ElButton>
-          <ElButton type="primary" @click="searchTasks">
+          <ElButton type="primary" @click="handleQueryPage">
             <ElIcon class="mr-1"><Search /></ElIcon>
             查询
           </ElButton>
+          <ElButton @click="handleReset">
+            <ElIcon class="mr-1"><Refresh /></ElIcon>
+            重置
+          </ElButton>
+
+          <ElButton type="primary" @click="handleCreateTask">
+            <ElIcon class="mr-1"><Plus /></ElIcon>
+            新增
+          </ElButton>
         </div>
       </div>
-
       <ElCollapse v-model="activeCollapse">
         <ElCollapseItem name="1">
           <div class="query-form">
             <div class="form-item">
               <label>任务名称</label>
               <ElInput
-                v-model="queryParams.name"
+                v-model="filterForm.keyword"
                 placeholder="请输入任务名称"
                 clearable
               >
@@ -234,74 +231,87 @@ onMounted(() => {
             </div>
 
             <div class="form-item">
-              <label>任务策略</label>
+              <label>任务状态</label>
               <ElSelect
-                v-model="queryParams.strategy"
-                placeholder="请选择任务策略"
+                v-model="filterForm.status"
+                placeholder="任务状态"
                 clearable
               >
-                <ElOption label="全部" value="" />
-                <ElOption label="全量回放" value="full" />
-                <ElOption label="抽样回放" value="sample" />
-                <ElOption label="定时回放" value="scheduled" />
+                <ElOption label="全部" value="all" />
+                <ElOption label="待定" value="pending" />
+                <ElOption label="等待" value="waiting" />
+                <ElOption label="运行中" value="running" />
+                <ElOption label="失败" value="fail" />
+                <ElOption label="中止" value="aborted" />
+                <ElOption label="成功" value="success" />
+                <ElOption label="关闭" value="closed" />
               </ElSelect>
-            </div>
-
-            <div class="form-item">
-              <label>创建时间</label>
-              <ElDatePicker
-                v-model="queryParams.dateRange"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-              />
             </div>
           </div>
         </ElCollapseItem>
       </ElCollapse>
 
       <!-- 数据表格 -->
-      <ElTable :data="tableData" class="data-table">
-        <ElTableColumn prop="id" label="序号" width="80" />
+      <ElTable :data="paginated_task_replays" class="data-table">
+        <ElTableColumn type="selection" width="55" />
+        <ElTableColumn prop="id" label="任务编号" />
         <ElTableColumn prop="name" label="任务名称" />
-        <ElTableColumn label="任务策略" width="120">
+
+        <ElTableColumn label="回放时间" width="300">
           <template #default="{ row }">
-            <ElTag
-              :type="
-                row.strategy === 'full'
-                  ? 'primary'
-                  : row.strategy === 'sample'
-                    ? 'success'
-                    : 'warning'
-              "
-            >
-              {{
-                row.strategy === 'full'
-                  ? '全量回放'
-                  : row.strategy === 'sample'
-                    ? '抽样回放'
-                    : '定时回放'
-              }}
+            <ElTag type="primary">
+              {{ row.replay_time }}
             </ElTag>
           </template>
         </ElTableColumn>
-        <ElTableColumn prop="rule" label="关联回放规则" />
-        <ElTableColumn prop="createTime" label="创建时间" />
-        <ElTableColumn prop="creator" label="创建人" />
-        <ElTableColumn prop="updater" label="更新人" />
-        <ElTableColumn prop="updateTime" label="更新时间" />
-        <ElTableColumn label="操作" width="180">
+        <ElTableColumn label="回放域名/地址">
+          <template #default="{ row }">
+            <ElTag type="info">
+              {{ row.replay_addr }}
+            </ElTag>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="任务状态">
+          <template #default="{ row }">
+            <ElTag :type="getTaskStatusType(row.status)">
+              {{ getTaskStatusText(row.status) }}
+            </ElTag>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="异常原因" width="300">
+          <template #default="{ row }">
+            <ElText type="danger">{{ row.fail_reason }}</ElText>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="执行时间">
+          <template #default="{ row }">
+            <ElTag type="info">
+              {{ row.execute_time }}
+            </ElTag>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="操作" width="250">
           <template #default="{ row }">
             <div class="action-buttons">
-              <ElButton type="primary" size="small" @click="showDetail(row.id)">
-                <ElIcon><View /></ElIcon>
+              <ElButton
+                link
+                type="primary"
+                size="small"
+                @click="handleReplayTaskDetail(row.id)"
+              >
+                查看
               </ElButton>
-              <ElButton type="warning" size="small" @click="editTask(row.id)">
-                <ElIcon><Edit /></ElIcon>
+              <ElButton link type="warning" size="small">
+                <ElIcon> 编辑 </ElIcon>
               </ElButton>
-              <ElButton type="danger" size="small" @click="deleteTask(row.id)">
-                <ElIcon><Delete /></ElIcon>
+              <ElButton link type="danger" size="small"> 删除 </ElButton>
+              <ElButton
+                link
+                type="primary"
+                size="small"
+                @click="handleExecute(row)"
+              >
+                执行
               </ElButton>
             </div>
           </template>
@@ -309,24 +319,12 @@ onMounted(() => {
       </ElTable>
 
       <!-- 分页 -->
-      <div class="pagination-bar">
-        <div>
-          <p class="pagination-info">
-            显示第 {{ (pagination.currentPage - 1) * pagination.pageSize + 1 }} 至
-            {{
-              Math.min(
-                pagination.currentPage * pagination.pageSize,
-                pagination.total,
-              )
-            }}
-            条，共 {{ pagination.total }} 条记录
-          </p>
-        </div>
+      <div class="mt-4 flex justify-end">
         <ElPagination
-          v-model:current-page="pagination.currentPage"
-          v-model:page-size="pagination.pageSize"
-          :page-sizes="[5, 10, 20, 50]"
-          layout="prev, pager, next, sizes"
+          v-model:current-page="pagination.current_page"
+          v-model:page-size="pagination.page_size"
+          :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next, jumper"
           :total="pagination.total"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -334,105 +332,20 @@ onMounted(() => {
       </div>
     </ElCard>
 
-    <!-- 详情弹窗 -->
-    <ElDialog
-      v-model="detailDialogVisible"
-      title="任务详情"
-      width="70%"
-      top="5vh"
-      class="detail-dialog"
-    >
-      <div v-if="currentTask" class="detail-content">
-        <div class="detail-grid">
-          <div class="detail-item">
-            <label>序号</label>
-            <div class="detail-value">{{ currentTask.id }}</div>
-          </div>
-          <div class="detail-item">
-            <label>任务名称</label>
-            <div class="detail-value">{{ currentTask.name }}</div>
-          </div>
-          <div class="detail-item">
-            <label>任务策略</label>
-            <div class="detail-value">
-              {{
-                currentTask.strategy === 'full'
-                  ? '全量回放'
-                  : currentTask.strategy === 'sample'
-                    ? '抽样回放'
-                    : '定时回放'
-              }}
-            </div>
-          </div>
-          <div class="detail-item">
-            <label>关联回放规则</label>
-            <div class="detail-value">{{ currentTask.rule }}</div>
-          </div>
-          <div class="detail-item">
-            <label>创建时间</label>
-            <div class="detail-value">{{ currentTask.createTime }}</div>
-          </div>
-          <div class="detail-item">
-            <label>创建人</label>
-            <div class="detail-value">{{ currentTask.creator }}</div>
-          </div>
-          <div class="detail-item">
-            <label>更新时间</label>
-            <div class="detail-value">{{ currentTask.updateTime }}</div>
-          </div>
-          <div class="detail-item">
-            <label>更新人</label>
-            <div class="detail-value">{{ currentTask.updater }}</div>
-          </div>
-        </div>
-      </div>
-      <template #footer>
-        <ElButton @click="detailDialogVisible = false">关闭</ElButton>
-      </template>
-    </ElDialog>
+    <ReplayTaskDialog
+      v-model="replayTaskDialogVisible"
+      :selected-pools="selected_pools"
+      :mode="mode"
+      @submit="handleSubmitTask"
+      :task-id="currentTaskId"
+    />
 
-    <!-- 新增/编辑任务弹窗 -->
-    <ElDialog
-      v-model="taskDialogVisible"
-      :title="isEditMode ? '编辑任务' : '新增任务'"
-      width="50%"
-      class="task-form-dialog"
-    >
-      <ElForm :model="taskForm" label-width="120px" class="task-form">
-        <ElFormItem label="任务名称" prop="name" required>
-          <ElInput
-            v-model="taskForm.name"
-            placeholder="请输入任务名称(最多50字符)"
-            maxlength="50"
-            show-word-limit
-          />
-        </ElFormItem>
-        <ElFormItem label="任务类型" prop="strategy" required>
-          <ElSelect
-            v-model="taskForm.strategy"
-            placeholder="请选择任务类型"
-            :disabled="isEditMode"
-          >
-            <ElOption label="全量回放" value="full" />
-            <ElOption label="抽样回放" value="sample" />
-            <ElOption label="定时回放" value="scheduled" />
-          </ElSelect>
-        </ElFormItem>
-        <ElFormItem label="关联回放规则" prop="rule" required>
-          <ElSelect v-model="taskForm.rule" placeholder="请选择回放规则">
-            <ElOption label="用户查询规则集" value="用户查询规则集" />
-            <ElOption label="订单处理规则集" value="订单处理规则集" />
-            <ElOption label="支付验证规则集" value="支付验证规则集" />
-            <ElOption label="商品查询规则集" value="商品查询规则集" />
-            <ElOption label="库存检查规则集" value="库存检查规则集" />
-          </ElSelect>
-        </ElFormItem>
-      </ElForm>
-      <template #footer>
-        <ElButton @click="taskDialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="saveTask">保存</ElButton>
-      </template>
-    </ElDialog>
+    <ExecuteConfirmDialog
+      v-model:visible="confirmDialog.visible"
+      title="友情提示"
+      :content="`确定要执行任务【${confirmDialog.currentTask?.name}】吗？`"
+      @confirm="confirmExecute"
+    />
   </div>
 </template>
 
@@ -445,13 +358,8 @@ onMounted(() => {
   .query-card {
     padding: 0.75rem;
     border-radius: 8px;
+    height: 100%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-    .action-bar {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 0.75rem;
-    }
 
     .query-bar {
       margin-bottom: 0.75rem;
@@ -481,63 +389,13 @@ onMounted(() => {
     .data-table {
       margin-top: 0.75rem;
       width: 100%;
-
-      .el-table__cell {
-        padding: 0.5rem 0;
-      }
+      height: 100%;
 
       .action-buttons {
         display: flex;
         gap: 0.5rem;
       }
     }
-
-    .pagination-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 0.75rem;
-
-      .pagination-info {
-        font-size: 0.875rem;
-        color: #666;
-      }
-    }
-  }
-
-  .detail-dialog {
-    .detail-content {
-      .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0.75rem;
-
-        .detail-item {
-          label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 0.875rem;
-            color: #666;
-          }
-
-          .detail-value {
-            padding: 0.5rem;
-            background-color: #f5f5f5;
-            border-radius: 4px;
-            font-size: 0.875rem;
-          }
-        }
-      }
-    }
-  }
-
-  .task-form-dialog {
-    .task-form {
-      .el-form-item {
-        margin-bottom: 1rem;
-      }
-    }
   }
 }
-
 </style>

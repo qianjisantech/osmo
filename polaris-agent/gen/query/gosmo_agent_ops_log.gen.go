@@ -17,7 +17,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/qianjisantech/gosmo-agent/gen/model"
+	"github.com/qianjisantech/polaris-agent/gen/model"
 )
 
 func newGosmoAgentOpsLog(db *gorm.DB, opts ...gen.DOOption) gosmoAgentOpsLog {

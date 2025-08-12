@@ -37,6 +37,7 @@ func main() {
 		"polaris_task_record",
 		"polaris_traffic_pool",
 		"polaris_monitor_center",
+		"polaris_task_replay",
 	}
 
 	// Apply configurations to all tables

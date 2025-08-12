@@ -1,6 +1,7 @@
 import "auth/auth.api"
 import "system/user.api"
 import "polaris/task_record.api"
+import "polaris/task_replay.api"
 import "polaris/resource_agent.api "
 import "polaris/traffic_pool.api "
 import "edi/polaris.api "

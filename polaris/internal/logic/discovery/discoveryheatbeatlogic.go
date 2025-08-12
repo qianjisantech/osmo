@@ -50,6 +50,7 @@ func (l *DiscoveryHeatBeatLogic) DiscoveryHeatBeat(req *types.DiscoveryHeatBeatR
 		ID:                    id,
 		IP:                    req.IP,
 		Status:                req.Status,
+		ExecuteStatus:         req.ExecuteStatus,
 		CPUCores:              int32(req.CPUCores),
 		CPUUsedPercent:        req.CPUUsedPercent,
 		CPUFreePercent:        req.CPUFreePercent,

@@ -8,6 +8,7 @@ import {
   ElDescriptions,
   ElDescriptionsItem,
   ElDialog,
+  ElInput,
   ElMessage,
   ElProgress,
   ElTable,
@@ -183,6 +184,17 @@ const getTaskStatusType = (status: string): TaskRecordNameSpace.ElTagType => {
           <ElProgress :percentage="45" />
           <div class="mt-1 text-right">45 Mbps</div>
         </div>
+        <div>
+          <h5 class="mb-2 text-sm text-gray-500">识别码</h5>
+          <ElInput
+            type="textarea"
+            v-model="agentDetail.identification_code"
+            placeholder="执行机描述信息"
+            :disabled="true"
+            clearable
+            :rows="7"
+          />
+        </div>
       </div>
 
       <!-- 任务列表 -->
@@ -201,13 +213,6 @@ const getTaskStatusType = (status: string): TaskRecordNameSpace.ElTagType => {
           <template #default="{ row }">
             <ElTag type="primary" size="small" class="status-tag">
               {{ row.strategy_name }}
-            </ElTag>
-          </template>
-        </ElTableColumn>
-        <ElTableColumn label="关联规则">
-          <template #default="{ row }">
-            <ElTag type="primary" size="small" class="status-tag">
-              {{ row.rule_name }}
             </ElTag>
           </template>
         </ElTableColumn>

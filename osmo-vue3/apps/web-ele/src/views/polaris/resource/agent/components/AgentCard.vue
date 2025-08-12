@@ -141,15 +141,15 @@ const progressColor = computed(() => {
         执行状态：
         <ElTag
           v-if="agent.execute_status"
-          :type="agent.execute_status === 'idle' ? 'success' : 'warning'"
+          :type="agent.execute_status === 'free' ? 'success' : 'warning'"
           size="small"
           :class="
-            agent.execute_status === 'idle'
+            agent.execute_status === 'free'
               ? 'text-green-500'
               : 'text-orange-500'
           "
         >
-          {{ agent.execute_status === 'idle' ? '空闲' : '忙碌' }}
+          {{ agent.execute_status === 'free' ? '空闲' : '忙碌' }}
         </ElTag>
       </p>
       <p class="text-sm font-medium text-gray-500">
