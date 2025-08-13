@@ -14,4 +14,8 @@ export const overridesPreferences = defineOverridesPreferences({
   theme: {
     mode: 'light',
   },
+  tabbar: {
+    maxCount: 5,
+    persist: false,
+  },
 });

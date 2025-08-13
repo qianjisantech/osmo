@@ -41,7 +41,7 @@ export const overridesPreferences = defineOverridesPreferences({
 ```ts {3}
  {
     meta: {
-      authority: ['super'],
+      authority: [''],
     },
 },
 ```
