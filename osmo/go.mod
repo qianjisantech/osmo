@@ -4,7 +4,6 @@ go 1.23.9
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/emicklei/go-restful/v3 v3.11.0
 	github.com/go-mysql-org/go-mysql v1.12.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/zeromicro/go-zero v1.8.1

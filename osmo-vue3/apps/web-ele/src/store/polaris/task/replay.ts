@@ -6,7 +6,8 @@ import { defineStore } from 'pinia';
 
 import {
   replayTaskCreateApi,
-  taskReplayDetailApi, taskReplayExecuteApi,
+  taskReplayDetailApi,
+  taskReplayExecuteApi,
   taskReplayQueryPageApi,
 } from '#/api/polaris/task/replay';
 
@@ -119,8 +120,11 @@ export const useTaskReplayStore = defineStore('taskReplay', () => {
       queryLoading.value = false;
     }
   }
-
+  function $reset() {
+    queryLoading.value = false;
+  }
   return {
+    $reset,
     queryLoading,
     createFunc,
     queryPage,

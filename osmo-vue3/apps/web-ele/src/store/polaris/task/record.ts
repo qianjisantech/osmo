@@ -77,8 +77,11 @@ export const useTaskRecordStore = defineStore('taskRecord', () => {
       queryLoading.value = false;
     }
   }
-
+  function $reset() {
+    queryLoading.value = false;
+  }
   return {
+    $reset,
     queryPage,
     queryLoading,
     taskRecordQueryPageResult,

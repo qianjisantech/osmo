@@ -1,4 +1,3 @@
-
 import type { TrafficPoolNamespace } from '#/types/traffic/pool';
 
 import { reactive, ref } from 'vue';
@@ -43,8 +42,11 @@ export const useTrafficPoolStore = defineStore('trafficPool', () => {
       queryLoading.value = false;
     }
   }
-
+  function $reset() {
+    queryLoading.value = false;
+  }
   return {
+    $reset,
     queryPage,
     queryLoading,
     trafficPoolQueryPageResult,

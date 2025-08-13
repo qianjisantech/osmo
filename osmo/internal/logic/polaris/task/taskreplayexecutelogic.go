@@ -104,11 +104,11 @@ func (l *TaskReplayExecuteLogic) TaskReplayExecute(req *types.TaskReplayExecuteR
 			} else {
 				// 3. 更新任务状态
 				_ = l.svcCtx.DB.Model(&model.PolarisTaskReplay{}).
-					Where("id = ?", req.ID).polaris_monitor_center
-				Updates(map[string]interface{}{
-					"status":      constant.TaskStatusSuccess,
-					"fail_reason": "",
-				})
+					Where("id = ?", req.ID).
+					Updates(map[string]interface{}{
+						"status":      constant.TaskStatusSuccess,
+						"fail_reason": "",
+					})
 			}
 		}()
 	}

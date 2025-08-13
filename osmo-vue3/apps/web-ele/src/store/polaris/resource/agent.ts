@@ -235,8 +235,11 @@ export const useAgentStore = defineStore('agent', () => {
       queryLoading.value = false;
     }
   }
-
+  function $reset() {
+    queryLoading.value = false;
+  }
   return {
+    $reset,
     queryPage,
     queryLoading,
     agentQueryPageResult,

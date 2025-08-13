@@ -45,5 +45,5 @@ service osmo-api {
     @handler AuthCodes
     get /codes () returns (AuthCodesResp)
     @handler AuthLogout
-    get /logout (AuthLogoutReq) returns (AuthLogoutResp)
+    post /logout (AuthLogoutReq) returns (AuthLogoutResp)
 }
